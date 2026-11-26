@@ -59,6 +59,8 @@ HTML_APP = r"""<!DOCTYPE html>
     --accent: #38bdf8;
     --accent-rgb: 56, 189, 248;
     --accent-glow: rgba(56, 189, 248, 0.36);
+    --cue-color: #ef4444;
+    --cue-glow: rgba(239, 68, 68, 0.9);
     --amber: #f59e0b;
     --amber-glow: rgba(245, 158, 11, 0.35);
     --green: #10b981;
@@ -696,7 +698,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
   .cube-stage:active { cursor: grabbing; }
 
-  /* Cube-sized Red Notation Cue placed in front of the 3D Z-plane */
+  /* Borderless Cube-Sized Notation Overlay in Front of the 3D Z-plane */
   .move-cue-overlay {
     position: absolute;
     inset: 0;
@@ -714,24 +716,20 @@ HTML_APP = r"""<!DOCTYPE html>
     transform: translateZ(260px) scale(1);
   }
   .move-cue-badge {
-    width: 176px;
-    height: 176px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 7.4rem;
+    font-size: 7.8rem;
     font-weight: 800;
     letter-spacing: -0.05em;
     line-height: 1;
-    color: #ef4444;
-    border-radius: 24px;
-    background: rgba(8, 10, 16, 0.58);
-    border: 2px solid rgba(239, 68, 68, 0.45);
+    color: var(--cue-color);
+    background: transparent;
+    border: none;
     text-shadow:
-      0 0 28px rgba(239, 68, 68, 0.95),
-      0 6px 24px rgba(0, 0, 0, 0.95);
-    box-shadow: 0 0 42px rgba(239, 68, 68, 0.28);
+      0 0 28px var(--cue-glow),
+      0 6px 24px rgba(0, 0, 0, 0.96);
   }
 
   .cube-world {
@@ -953,6 +951,19 @@ HTML_APP = r"""<!DOCTYPE html>
       </label>
     </div>
 
+    <div class="section-label">3D Move Notation</div>
+    <div class="config-card">
+      <span>Show Notation</span>
+      <label class="switch">
+        <input type="checkbox" id="toggleNotationChk" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="config-card">
+      <span>Notation Color</span>
+      <input type="color" id="notationColorPicker" value="#ef4444" />
+    </div>
+
     <div class="section-label">Dual-Hand Trigger Keys</div>
     <div class="config-card">
       <span>Left Key</span>
@@ -1014,7 +1025,7 @@ HTML_APP = r"""<!DOCTYPE html>
       </div>
       <div style="display:flex;gap:4px;">
         <button class="pill-btn speed-btn" data-cue="760" data-turn="750" data-pause="950">0.5x</button>
-        <button class="pill-btn speed-btn active" data-cue="540" data-turn="480" data-pause="650">1x</button>
+        <button class="pill-btn speed-btn active" data-cue="580" data-turn="480" data-pause="650">1x</button>
         <button class="pill-btn speed-btn" data-cue="340" data-turn="260" data-pause="360">1.5x</button>
       </div>
     </div>
@@ -1023,8 +1034,8 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v11_solves";
-  const STORAGE_CFG = "cc_v11_cfg";
+  const STORAGE_SOLVES = "cc_v12_solves";
+  const STORAGE_CFG = "cc_v12_cfg";
 
   let cfg = {
     leftKey: "AltLeft",
@@ -1033,6 +1044,8 @@ HTML_APP = r"""<!DOCTYPE html>
     scene: "clouds",
     accentColor: "#38bdf8",
     showLabels: false,
+    showNotation: true,
+    notationColor: "#ef4444",
     sceneSize: 1.0,
     sceneSpeed: 1.0,
     sceneIntensity: 1.0
@@ -1403,16 +1416,21 @@ HTML_APP = r"""<!DOCTYPE html>
     document.body.dataset.scene = cfg.scene;
     document.body.classList.toggle("show-nav-labels", Boolean(cfg.showLabels));
     document.getElementById("toggleLabelsChk").checked = Boolean(cfg.showLabels);
+    document.getElementById("toggleNotationChk").checked = Boolean(cfg.showNotation);
+    document.getElementById("notationColorPicker").value = cfg.notationColor;
 
     accentRgb = hexToRgb(cfg.accentColor);
     const { r, g, b } = accentRgb;
     const inten = cfg.sceneIntensity;
+    const cueRgb = hexToRgb(cfg.notationColor);
     const root = document.documentElement.style;
     root.setProperty("--accent", cfg.accentColor);
     root.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
     root.setProperty("--accent-glow", `rgba(${r}, ${g}, ${b}, 0.38)`);
     root.setProperty("--bg-glow-1", `rgba(${r}, ${g}, ${b}, ${Math.min(0.45, 0.24 * inten)})`);
     root.setProperty("--bg-glow-2", `rgba(${r}, ${g}, ${b}, ${Math.min(0.35, 0.14 * inten)})`);
+    root.setProperty("--cue-color", cfg.notationColor);
+    root.setProperty("--cue-glow", `rgba(${cueRgb.r}, ${cueRgb.g}, ${cueRgb.b}, 0.9)`);
     document.getElementById("customColorPicker").value = cfg.accentColor;
 
     document.querySelectorAll(".scene-card").forEach(btn => {
@@ -1691,7 +1709,7 @@ HTML_APP = r"""<!DOCTYPE html>
     saveSolves();
   };
 
-  // True 27-Cubie 3D Rubik's Cube Engine with Pre-Move Red Notation Cue
+  // True 27-Cubie 3D Rubik's Cube Engine with Configurable Borderless Notation Cue
   const FACE_HEX = {
     U: "#f8fafc",
     D: "#facc15",
@@ -1865,45 +1883,53 @@ HTML_APP = r"""<!DOCTYPE html>
     moveCueOverlay.classList.remove("visible");
   }
 
-  // Shows the red move notation on top of the cube, fades it out, then rotates the layer
+  function performLayerTurn(mv, onDone) {
+    const spec = parseMoveSpec(mv);
+    const layer = cubies.filter(spec.filter);
+
+    const pivot = document.createElement("div");
+    pivot.style.position = "absolute";
+    pivot.style.transformStyle = "preserve-3d";
+    pivot.style.transition = `transform ${turnMs}ms cubic-bezier(0.25, 0.85, 0.35, 1)`;
+    pivot.style.transform = "rotate3d(0,0,0,0deg)";
+    cubeWorld.appendChild(pivot);
+    layer.forEach(c => pivot.appendChild(c.el));
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (spec.axis === "x") pivot.style.transform = `rotateX(${spec.deg}deg)`;
+        else if (spec.axis === "y") pivot.style.transform = `rotateY(${spec.deg}deg)`;
+        else pivot.style.transform = `rotateZ(${spec.deg}deg)`;
+      });
+    });
+
+    setTimeout(() => {
+      layer.forEach(c => cubeWorld.appendChild(c.el));
+      pivot.remove();
+      commitMoveInstant(mv);
+      isAnimating = false;
+      if (onDone) onDone();
+    }, turnMs + 25);
+  }
+
   function executeMoveWithNotationCue(mv, stepNumber, onDone) {
     if (isAnimating) return;
     isAnimating = true;
 
     moveDescEl.textContent = `Step ${stepNumber}/${visMoves.length}: ${mv} — ${MOVE_TEXT[mv] || ""}`;
+
+    if (!cfg.showNotation) {
+      performLayerTurn(mv, onDone);
+      return;
+    }
+
     moveCueBadge.textContent = mv;
     moveCueOverlay.classList.add("visible");
 
     cueTimer = setTimeout(() => {
       cueTimer = null;
       moveCueOverlay.classList.remove("visible");
-
-      const spec = parseMoveSpec(mv);
-      const layer = cubies.filter(spec.filter);
-
-      const pivot = document.createElement("div");
-      pivot.style.position = "absolute";
-      pivot.style.transformStyle = "preserve-3d";
-      pivot.style.transition = `transform ${turnMs}ms cubic-bezier(0.25, 0.85, 0.35, 1)`;
-      pivot.style.transform = "rotate3d(0,0,0,0deg)";
-      cubeWorld.appendChild(pivot);
-      layer.forEach(c => pivot.appendChild(c.el));
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (spec.axis === "x") pivot.style.transform = `rotateX(${spec.deg}deg)`;
-          else if (spec.axis === "y") pivot.style.transform = `rotateY(${spec.deg}deg)`;
-          else pivot.style.transform = `rotateZ(${spec.deg}deg)`;
-        });
-      });
-
-      setTimeout(() => {
-        layer.forEach(c => cubeWorld.appendChild(c.el));
-        pivot.remove();
-        commitMoveInstant(mv);
-        isAnimating = false;
-        if (onDone) onDone();
-      }, turnMs + 25);
+      performLayerTurn(mv, onDone);
     }, cueMs);
   }
 
@@ -2108,6 +2134,17 @@ HTML_APP = r"""<!DOCTYPE html>
     saveCfg();
   });
 
+  document.getElementById("toggleNotationChk").addEventListener("change", e => {
+    cfg.showNotation = e.target.checked;
+    if (!cfg.showNotation) clearMoveCue();
+    saveCfg();
+  });
+
+  document.getElementById("notationColorPicker").addEventListener("input", e => {
+    cfg.notationColor = e.target.value;
+    saveCfg();
+  });
+
   document.getElementById("bindLeftBtn").addEventListener("click", e => {
     bindingTarget = "left";
     e.target.textContent = "Press any key...";
@@ -2130,6 +2167,8 @@ HTML_APP = r"""<!DOCTYPE html>
     cfg.rightKey = "AltRight";
     cfg.holdMs = 450;
     cfg.showLabels = false;
+    cfg.showNotation = true;
+    cfg.notationColor = "#ef4444";
     cfg.scene = "clouds";
     cfg.accentColor = "#38bdf8";
     cfg.sceneSize = 1.0;
