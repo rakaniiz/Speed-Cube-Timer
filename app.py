@@ -11,17 +11,24 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-        #MainMenu, header, footer { visibility: hidden; }
-        .block-container {
+        #MainMenu, header, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] {
+            display: none !important;
+        }
+        html, body, [data-testid="stAppViewContainer"], .main, .block-container {
             padding: 0 !important;
             margin: 0 !important;
-            max-width: 100% !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100vw !important;
+            overflow: hidden !important;
         }
         iframe {
-            display: block;
+            position: fixed !important;
+            inset: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
             border: none !important;
+            z-index: 9999 !important;
         }
     </style>
     """,
@@ -42,11 +49,11 @@ HTML_APP = r"""<!DOCTYPE html>
     --bg-core: #07090f;
     --bg-glow-1: rgba(56, 189, 248, 0.14);
     --bg-glow-2: rgba(99, 102, 241, 0.12);
-    --glass: rgba(15, 20, 32, 0.62);
-    --glass-strong: rgba(12, 16, 26, 0.88);
-    --surface: rgba(255, 255, 255, 0.045);
-    --surface-hover: rgba(255, 255, 255, 0.09);
-    --border: rgba(255, 255, 255, 0.11);
+    --glass: rgba(15, 20, 32, 0.65);
+    --glass-strong: rgba(12, 16, 26, 0.9);
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-hover: rgba(255, 255, 255, 0.1);
+    --border: rgba(255, 255, 255, 0.12);
     --text: #f8fafc;
     --muted: #94a3b8;
     --accent: #38bdf8;
@@ -56,20 +63,19 @@ HTML_APP = r"""<!DOCTYPE html>
     --green: #10b981;
     --green-glow: rgba(16, 185, 129, 0.4);
     --red: #ef4444;
-    --gold: #fbbf24;
   }
 
   body[data-theme="galaxy"] {
     --bg-core: #060412;
-    --bg-glow-1: rgba(168, 85, 247, 0.24);
-    --bg-glow-2: rgba(59, 130, 246, 0.2);
+    --bg-glow-1: rgba(168, 85, 247, 0.25);
+    --bg-glow-2: rgba(59, 130, 246, 0.22);
     --accent: #c084fc;
     --accent-glow: rgba(192, 132, 252, 0.4);
   }
 
   body[data-theme="inferno"] {
     --bg-core: #110403;
-    --bg-glow-1: rgba(249, 115, 22, 0.25);
+    --bg-glow-1: rgba(249, 115, 22, 0.26);
     --bg-glow-2: rgba(225, 29, 72, 0.22);
     --accent: #fb923c;
     --accent-glow: rgba(251, 146, 60, 0.4);
@@ -98,12 +104,16 @@ HTML_APP = r"""<!DOCTYPE html>
     user-select: none;
   }
 
-  body {
-    height: 100vh;
+  html, body {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-core);
     color: var(--text);
+  }
+
+  body {
     display: flex;
     flex-direction: column;
     position: relative;
@@ -127,15 +137,15 @@ HTML_APP = r"""<!DOCTYPE html>
     animation: drift 14s ease-in-out infinite alternate;
   }
   .orb-1 {
-    width: 520px;
-    height: 520px;
+    width: 500px;
+    height: 500px;
     background: var(--bg-glow-1);
     top: -120px;
-    left: 15%;
+    left: 14%;
   }
   .orb-2 {
-    width: 480px;
-    height: 480px;
+    width: 460px;
+    height: 460px;
     background: var(--bg-glow-2);
     bottom: -140px;
     right: 12%;
@@ -150,25 +160,26 @@ HTML_APP = r"""<!DOCTYPE html>
   header {
     position: relative;
     z-index: 15;
+    width: 100%;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 24px;
+    padding: 12px 20px;
     background: var(--glass);
     backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--border);
-    gap: 14px;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    gap: 10px;
+    transition: opacity 0.25s ease;
   }
 
   .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 9px;
     font-weight: 700;
     letter-spacing: 0.08em;
-    font-size: 0.9rem;
-    color: var(--text);
+    font-size: 0.88rem;
   }
   .brand-dot {
     width: 10px;
@@ -182,16 +193,16 @@ HTML_APP = r"""<!DOCTYPE html>
   .scramble-wrap {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
 
   .scramble-box {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 1.02rem;
+    font-size: 0.96rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    padding: 9px 18px;
-    border-radius: 12px;
+    letter-spacing: 0.03em;
+    padding: 8px 14px;
+    border-radius: 10px;
     background: var(--surface);
     border: 1px solid var(--border);
     cursor: pointer;
@@ -200,22 +211,23 @@ HTML_APP = r"""<!DOCTYPE html>
   .scramble-box:hover {
     background: var(--surface-hover);
     border-color: var(--accent);
-    box-shadow: 0 0 20px var(--accent-glow);
+    box-shadow: 0 0 18px var(--accent-glow);
   }
 
   .nav-group {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
   }
 
   .pill-btn {
     background: var(--surface);
     color: var(--muted);
     border: 1px solid var(--border);
-    padding: 7px 13px;
-    border-radius: 10px;
-    font-size: 0.8rem;
+    padding: 6px 11px;
+    border-radius: 9px;
+    font-size: 0.78rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -228,41 +240,37 @@ HTML_APP = r"""<!DOCTYPE html>
     color: var(--text);
     border-color: var(--accent);
     background: rgba(255, 255, 255, 0.09);
-    box-shadow: 0 0 14px var(--accent-glow);
+    box-shadow: 0 0 12px var(--accent-glow);
   }
 
   main {
     position: relative;
     z-index: 5;
     flex: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
   }
 
   .focus-banner {
-    padding: 6px 14px;
+    padding: 5px 14px;
     border-radius: 999px;
     background: rgba(245, 158, 11, 0.14);
     border: 1px solid rgba(245, 158, 11, 0.4);
     color: var(--amber);
-    font-size: 0.78rem;
-    font-weight: 500;
-    margin-bottom: 14px;
+    font-size: 0.76rem;
+    margin-bottom: 12px;
     opacity: 0;
-    transform: translateY(-4px);
-    transition: all 0.18s ease;
+    transition: opacity 0.18s ease;
   }
-  body.unfocused .focus-banner {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  body.unfocused .focus-banner { opacity: 1; }
 
   .timer-display {
     font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(4.6rem, 13vw, 9.2rem);
+    font-size: clamp(4.2rem, 12vw, 8.8rem);
     font-weight: 800;
     letter-spacing: -0.04em;
     line-height: 1;
@@ -279,17 +287,16 @@ HTML_APP = r"""<!DOCTYPE html>
     text-shadow: 0 0 42px var(--green-glow);
     transform: scale(1.015);
   }
-  .timer-display.dnf {
-    color: var(--red);
-  }
+  .timer-display.dnf { color: var(--red); }
 
   .progress-track {
-    width: 290px;
+    width: 280px;
+    max-width: 80vw;
     height: 6px;
     background: rgba(255, 255, 255, 0.08);
     border-radius: 999px;
     overflow: hidden;
-    margin-top: 22px;
+    margin-top: 20px;
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
   .progress-fill {
@@ -297,7 +304,6 @@ HTML_APP = r"""<!DOCTYPE html>
     width: 0%;
     background: linear-gradient(90deg, #d97706, var(--amber));
     border-radius: 999px;
-    transition: background 0.12s ease;
   }
   .progress-fill.armed {
     background: linear-gradient(90deg, #059669, var(--green));
@@ -306,17 +312,17 @@ HTML_APP = r"""<!DOCTYPE html>
 
   .sensors {
     display: flex;
-    gap: 14px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 18px;
   }
 
   .sensor {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 18px;
+    padding: 7px 16px;
     border-radius: 999px;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 600;
     background: var(--glass);
     backdrop-filter: blur(12px);
@@ -329,7 +335,6 @@ HTML_APP = r"""<!DOCTYPE html>
     height: 8px;
     border-radius: 50%;
     background: var(--muted);
-    transition: all 0.12s ease;
   }
   .sensor.down {
     border-color: var(--amber);
@@ -353,16 +358,16 @@ HTML_APP = r"""<!DOCTYPE html>
   }
 
   .hint {
-    margin-top: 14px;
-    font-size: 0.82rem;
+    margin-top: 13px;
+    font-size: 0.8rem;
     color: var(--muted);
-    letter-spacing: 0.01em;
+    text-align: center;
   }
 
   .post-actions {
     display: flex;
     gap: 8px;
-    margin-top: 20px;
+    margin-top: 18px;
     opacity: 0;
     pointer-events: none;
     transform: translateY(6px);
@@ -376,15 +381,15 @@ HTML_APP = r"""<!DOCTYPE html>
 
   .stats-dock {
     position: absolute;
-    bottom: 22px;
+    bottom: 18px;
     display: flex;
-    gap: 22px;
-    padding: 10px 22px;
-    border-radius: 14px;
+    gap: 20px;
+    padding: 9px 20px;
+    border-radius: 13px;
     background: var(--glass);
     backdrop-filter: blur(16px);
     border: 1px solid var(--border);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: var(--muted);
     transition: opacity 0.25s ease;
   }
@@ -397,10 +402,11 @@ HTML_APP = r"""<!DOCTYPE html>
 
   .drawer {
     position: fixed;
-    top: 63px;
+    top: 58px;
     right: 0;
     bottom: 0;
-    width: 340px;
+    width: 330px;
+    max-width: 90vw;
     background: var(--glass-strong);
     backdrop-filter: blur(22px);
     border-left: 1px solid var(--border);
@@ -413,34 +419,34 @@ HTML_APP = r"""<!DOCTYPE html>
   .drawer.open { transform: translateX(0); }
 
   .drawer-head {
-    padding: 15px 18px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     font-weight: 600;
   }
 
   .solve-list {
     flex: 1;
     overflow-y: auto;
-    padding: 12px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 6px;
   }
 
   .solve-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 9px 12px;
-    border-radius: 10px;
+    padding: 8px 11px;
+    border-radius: 9px;
     background: var(--surface);
     border: 1px solid transparent;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
+    font-size: 0.83rem;
   }
   .solve-item.star {
     border-color: rgba(251, 191, 36, 0.45);
@@ -453,8 +459,8 @@ HTML_APP = r"""<!DOCTYPE html>
     border: 1px solid var(--border);
     color: var(--muted);
     border-radius: 6px;
-    padding: 3px 6px;
-    font-size: 0.72rem;
+    padding: 2px 6px;
+    font-size: 0.7rem;
     cursor: pointer;
   }
   .mini-btn:hover { color: var(--text); border-color: var(--accent); }
@@ -462,7 +468,7 @@ HTML_APP = r"""<!DOCTYPE html>
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(2, 6, 14, 0.72);
+    background: rgba(2, 6, 14, 0.74);
     backdrop-filter: blur(8px);
     display: none;
     align-items: center;
@@ -472,15 +478,15 @@ HTML_APP = r"""<!DOCTYPE html>
   .modal-backdrop.open { display: flex; }
 
   .modal {
-    width: 420px;
-    max-width: 92vw;
+    width: 440px;
+    max-width: 94vw;
     background: #0f1422;
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 20px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 13px;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
   }
 
@@ -488,55 +494,84 @@ HTML_APP = r"""<!DOCTYPE html>
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.86rem;
+    font-size: 0.85rem;
     color: var(--muted);
   }
 
-  /* 3D Cube Visualizer */
+  /* 27-Cubie Real 3D Rubik's Cube */
   .cube-stage {
     width: 100%;
-    height: 230px;
+    height: 260px;
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 700px;
-    background: rgba(0, 0, 0, 0.28);
-    border-radius: 12px;
+    perspective: 820px;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.04), rgba(0,0,0,0.45));
+    border-radius: 13px;
     border: 1px solid var(--border);
     cursor: grab;
+    overflow: hidden;
   }
   .cube-stage:active { cursor: grabbing; }
 
-  .cube-3d {
-    width: 132px;
-    height: 132px;
+  .cube-world {
+    width: 0;
+    height: 0;
     position: relative;
     transform-style: preserve-3d;
     transform: rotateX(-26deg) rotateY(-36deg);
   }
 
-  .cube-face {
+  .cubie {
     position: absolute;
-    width: 132px;
-    height: 132px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    padding: 5px;
-    background: #0b0d12;
-    border-radius: 8px;
-    border: 2px solid #050608;
+    width: 46px;
+    height: 46px;
+    margin-left: -23px;
+    margin-top: -23px;
+    transform-style: preserve-3d;
   }
-  .face-U { transform: rotateX(90deg) translateZ(66px); }
-  .face-D { transform: rotateX(-90deg) translateZ(66px); }
-  .face-F { transform: translateZ(66px); }
-  .face-B { transform: rotateY(180deg) translateZ(66px); }
-  .face-L { transform: rotateY(-90deg) translateZ(66px); }
-  .face-R { transform: rotateY(90deg) translateZ(66px); }
 
-  .sticker {
-    border-radius: 4px;
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.35);
+  .cubie-face {
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    background: #0c0e14;
+    border: 1px solid #050609;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+  }
+  .cf-U { transform: rotateX(90deg) translateZ(23px); }
+  .cf-D { transform: rotateX(-90deg) translateZ(23px); }
+  .cf-F { transform: translateZ(23px); }
+  .cf-B { transform: rotateY(180deg) translateZ(23px); }
+  .cf-L { transform: rotateY(-90deg) translateZ(23px); }
+  .cf-R { transform: rotateY(90deg) translateZ(23px); }
+
+  .sticker-tile {
+    width: 38px;
+    height: 38px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: rgba(0, 0, 0, 0.55);
+    box-shadow:
+      inset 0 2px 3px rgba(255, 255, 255, 0.45),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .move-desc {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 600;
+    min-height: 18px;
   }
 
   .move-pills {
@@ -547,7 +582,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
   .move-pill {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     padding: 4px 8px;
     border-radius: 6px;
     background: var(--surface);
@@ -555,7 +590,7 @@ HTML_APP = r"""<!DOCTYPE html>
     color: var(--muted);
     cursor: pointer;
   }
-  .move-pill.done { color: var(--text); border-color: rgba(255, 255, 255, 0.22); }
+  .move-pill.done { color: var(--text); border-color: rgba(255, 255, 255, 0.24); }
   .move-pill.current {
     background: var(--accent);
     color: #050811;
@@ -623,8 +658,8 @@ HTML_APP = r"""<!DOCTYPE html>
   <div class="drawer-head">
     <span>Session Solves</span>
     <div style="display:flex;gap:6px;">
-      <button class="pill-btn" id="filterStarBtn" style="padding:4px 8px;font-size:0.75rem;">★ Only</button>
-      <button class="pill-btn" id="clearAllBtn" style="padding:4px 8px;font-size:0.75rem;">Clear All</button>
+      <button class="pill-btn" id="filterStarBtn" style="padding:4px 8px;font-size:0.74rem;">★ Only</button>
+      <button class="pill-btn" id="clearAllBtn" style="padding:4px 8px;font-size:0.74rem;">Clear All</button>
     </div>
   </div>
   <div class="solve-list" id="solveList"></div>
@@ -632,8 +667,8 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <!-- Key Configuration Modal -->
 <div class="modal-backdrop" id="configModal">
-  <div class="modal">
-    <div style="font-weight:600;font-size:0.96rem;">Trigger Key Settings</div>
+  <div class="modal" style="width:380px;">
+    <div style="font-weight:600;font-size:0.95rem;">Trigger Key Settings</div>
     <div class="modal-row">
       <span>Left Key</span>
       <button class="pill-btn" id="bindLeftBtn">AltLeft</button>
@@ -659,21 +694,15 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <!-- 3D Scramble Visualizer Modal -->
 <div class="modal-backdrop" id="visModal">
-  <div class="modal" style="width:480px;">
+  <div class="modal" style="width:500px;">
     <div style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-weight:600;font-size:0.95rem;">3D Scramble Guide (White Top, Green Front)</span>
+      <span style="font-weight:600;font-size:0.92rem;">3D Scramble Guide (White Top, Green Front)</span>
       <button class="pill-btn" id="closeVisBtn" style="padding:4px 9px;">✕</button>
     </div>
     <div class="cube-stage" id="cubeStage">
-      <div class="cube-3d" id="cube3d">
-        <div class="cube-face face-U" id="faceU"></div>
-        <div class="cube-face face-D" id="faceD"></div>
-        <div class="cube-face face-F" id="faceF"></div>
-        <div class="cube-face face-B" id="faceB"></div>
-        <div class="cube-face face-L" id="faceL"></div>
-        <div class="cube-face face-R" id="faceR"></div>
-      </div>
+      <div class="cube-world" id="cubeWorld"></div>
     </div>
+    <div class="move-desc" id="moveDesc">Solved — Press Play or Step Forward</div>
     <div class="move-pills" id="movePills"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
       <div style="display:flex;gap:6px;">
@@ -683,9 +712,9 @@ HTML_APP = r"""<!DOCTYPE html>
         <button class="pill-btn" id="visNextBtn">▶|</button>
       </div>
       <div style="display:flex;gap:4px;">
-        <button class="pill-btn speed-btn" data-ms="1400">0.5x</button>
-        <button class="pill-btn speed-btn active" data-ms="950">1x</button>
-        <button class="pill-btn speed-btn" data-ms="550">1.5x</button>
+        <button class="pill-btn speed-btn" data-turn="750" data-pause="1400">0.5x</button>
+        <button class="pill-btn speed-btn active" data-turn="480" data-pause="950">1x</button>
+        <button class="pill-btn speed-btn" data-turn="260" data-pause="520">1.5x</button>
       </div>
     </div>
   </div>
@@ -693,8 +722,8 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v4_solves";
-  const STORAGE_CFG = "cc_v4_cfg";
+  const STORAGE_SOLVES = "cc_v5_solves";
+  const STORAGE_CFG = "cc_v5_cfg";
 
   let cfg = { leftKey: "AltLeft", rightKey: "AltRight", holdMs: 450, theme: "galaxy" };
   try {
@@ -719,7 +748,7 @@ HTML_APP = r"""<!DOCTYPE html>
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  for (let i = 0; i < 42; i++) {
+  for (let i = 0; i < 44; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -754,7 +783,7 @@ HTML_APP = r"""<!DOCTYPE html>
     }
   }
 
-  // State machine: IDLE | HOLDING | ARMED | RUNNING
+  // Timer State Machine
   let phase = "IDLE";
   let leftDown = false;
   let rightDown = false;
@@ -909,21 +938,15 @@ HTML_APP = r"""<!DOCTYPE html>
     requestAnimationFrame(tick);
   }
 
-  // Multi-signal detection so Left Alt + Right Alt (and Windows/Turkish Q AltGr) work simultaneously
   function detectKeysOnDown(e) {
-    let hitLeft = false;
-    let hitRight = false;
+    let hitLeft = e.code === cfg.leftKey;
+    let hitRight = e.code === cfg.rightKey;
 
-    if (e.code === cfg.leftKey) hitLeft = true;
-    if (e.code === cfg.rightKey) hitRight = true;
-
-    // Fallback by physical key location for Alt keys when OS swaps AltGr / Alt codes
     if (cfg.leftKey === "AltLeft" && e.key === "Alt" && e.location === 1) hitLeft = true;
     if (cfg.rightKey === "AltRight") {
       if ((e.key === "Alt" && e.location === 2) || e.key === "AltGraph") hitRight = true;
       if (e.getModifierState && e.getModifierState("AltGraph")) hitRight = true;
     }
-
     return { hitLeft, hitRight };
   }
 
@@ -939,23 +962,18 @@ HTML_APP = r"""<!DOCTYPE html>
     }
 
     const { hitLeft, hitRight } = detectKeysOnDown(e);
-    const isAltOrSpace = hitLeft || hitRight || e.code === "Space" || e.key === "Alt" || e.key === "AltGraph";
-
-    if (isAltOrSpace) {
+    if (hitLeft || hitRight || e.code === "Space" || e.key === "Alt" || e.key === "AltGraph") {
       e.preventDefault();
       e.stopPropagation();
     }
 
     if (phase === "RUNNING") {
-      if (!e.repeat && (e.code === "Space" || hitLeft || hitRight)) {
-        stopRun();
-      }
+      if (!e.repeat && (e.code === "Space" || hitLeft || hitRight)) stopRun();
       return;
     }
 
     if (blockUntilRelease) return;
 
-    // Ignore Windows synthetic ControlLeft generated by Right Alt (AltGr)
     if (
       e.code === "ControlLeft" &&
       cfg.leftKey !== "ControlLeft" &&
@@ -967,7 +985,6 @@ HTML_APP = r"""<!DOCTYPE html>
       if (hitRight) rightDown = true;
     }
 
-    // Also sync modifier state in case first Alt event was swallowed while focusing
     if (cfg.leftKey === "AltLeft" && cfg.rightKey === "AltRight" && e.getModifierState) {
       if (e.getModifierState("AltGraph")) rightDown = true;
     }
@@ -1001,9 +1018,7 @@ HTML_APP = r"""<!DOCTYPE html>
     if (relRight) rightDown = false;
 
     if (blockUntilRelease) {
-      if (!leftDown && !rightDown && e.code !== "Space") {
-        blockUntilRelease = false;
-      }
+      if (!leftDown && !rightDown && e.code !== "Space") blockUntilRelease = false;
       updateSensors();
       return;
     }
@@ -1100,8 +1115,8 @@ HTML_APP = r"""<!DOCTYPE html>
     saveSolves();
   };
 
-  // 3D Cube State Engine (WCA: U=White, D=Yellow, F=Green, B=Blue, L=Orange, R=Red)
-  const COLORS = {
+  // True 27-Cubie 3D Rubik's Cube Engine with Layer Turn Animations
+  const FACE_HEX = {
     U: "#f8fafc",
     D: "#facc15",
     F: "#22c55e",
@@ -1110,124 +1125,239 @@ HTML_APP = r"""<!DOCTYPE html>
     R: "#ef4444"
   };
 
-  function solvedCube() {
-    return {
-      U: Array(9).fill("U"),
-      D: Array(9).fill("D"),
-      F: Array(9).fill("F"),
-      B: Array(9).fill("B"),
-      L: Array(9).fill("L"),
-      R: Array(9).fill("R")
-    };
-  }
+  const MOVE_TEXT = {
+    U: "Top Layer (White) — 90° Clockwise",
+    "U'": "Top Layer (White) — 90° Counter-Clockwise",
+    U2: "Top Layer (White) — 180° Half Turn",
+    D: "Bottom Layer (Yellow) — 90° Clockwise",
+    "D'": "Bottom Layer (Yellow) — 90° Counter-Clockwise",
+    D2: "Bottom Layer (Yellow) — 180° Half Turn",
+    R: "Right Layer (Red) — 90° Clockwise",
+    "R'": "Right Layer (Red) — 90° Counter-Clockwise",
+    R2: "Right Layer (Red) — 180° Half Turn",
+    L: "Left Layer (Orange) — 90° Clockwise",
+    "L'": "Left Layer (Orange) — 90° Counter-Clockwise",
+    L2: "Left Layer (Orange) — 180° Half Turn",
+    F: "Front Layer (Green) — 90° Clockwise",
+    "F'": "Front Layer (Green) — 90° Counter-Clockwise",
+    F2: "Front Layer (Green) — 180° Half Turn",
+    B: "Back Layer (Blue) — 90° Clockwise",
+    "B'": "Back Layer (Blue) — 90° Counter-Clockwise",
+    B2: "Back Layer (Blue) — 180° Half Turn"
+  };
 
-  function rotCW(arr) {
-    return [arr[6], arr[3], arr[0], arr[7], arr[4], arr[1], arr[8], arr[5], arr[2]];
-  }
-
-  function applyQuarter(c, face) {
-    c[face] = rotCW(c[face]);
-    const t = [0, 0, 0];
-    if (face === "U") {
-      for (let i = 0; i < 3; i++) t[i] = c.F[i];
-      for (let i = 0; i < 3; i++) c.F[i] = c.R[i];
-      for (let i = 0; i < 3; i++) c.R[i] = c.B[i];
-      for (let i = 0; i < 3; i++) c.B[i] = c.L[i];
-      for (let i = 0; i < 3; i++) c.L[i] = t[i];
-    } else if (face === "D") {
-      for (let i = 0; i < 3; i++) t[i] = c.F[6 + i];
-      for (let i = 0; i < 3; i++) c.F[6 + i] = c.L[6 + i];
-      for (let i = 0; i < 3; i++) c.L[6 + i] = c.B[6 + i];
-      for (let i = 0; i < 3; i++) c.B[6 + i] = c.R[6 + i];
-      for (let i = 0; i < 3; i++) c.R[6 + i] = t[i];
-    } else if (face === "R") {
-      const idx = [2, 5, 8], bIdx = [6, 3, 0];
-      for (let i = 0; i < 3; i++) t[i] = c.U[idx[i]];
-      for (let i = 0; i < 3; i++) c.U[idx[i]] = c.F[idx[i]];
-      for (let i = 0; i < 3; i++) c.F[idx[i]] = c.D[idx[i]];
-      for (let i = 0; i < 3; i++) c.D[idx[i]] = c.B[bIdx[i]];
-      for (let i = 0; i < 3; i++) c.B[bIdx[i]] = t[i];
-    } else if (face === "L") {
-      const idx = [0, 3, 6], bIdx = [8, 5, 2];
-      for (let i = 0; i < 3; i++) t[i] = c.U[idx[i]];
-      for (let i = 0; i < 3; i++) c.U[idx[i]] = c.B[bIdx[i]];
-      for (let i = 0; i < 3; i++) c.B[bIdx[i]] = c.D[idx[i]];
-      for (let i = 0; i < 3; i++) c.D[idx[i]] = c.F[idx[i]];
-      for (let i = 0; i < 3; i++) c.F[idx[i]] = t[i];
-    } else if (face === "F") {
-      const u = [6, 7, 8], r = [0, 3, 6], d = [2, 1, 0], l = [8, 5, 2];
-      for (let i = 0; i < 3; i++) t[i] = c.U[u[i]];
-      for (let i = 0; i < 3; i++) c.U[u[i]] = c.L[l[i]];
-      for (let i = 0; i < 3; i++) c.L[l[i]] = c.D[d[i]];
-      for (let i = 0; i < 3; i++) c.D[d[i]] = c.R[r[i]];
-      for (let i = 0; i < 3; i++) c.R[r[i]] = t[i];
-    } else if (face === "B") {
-      const u = [2, 1, 0], l = [0, 3, 6], d = [6, 7, 8], r = [8, 5, 2];
-      for (let i = 0; i < 3; i++) t[i] = c.U[u[i]];
-      for (let i = 0; i < 3; i++) c.U[u[i]] = c.R[r[i]];
-      for (let i = 0; i < 3; i++) c.R[r[i]] = c.D[d[i]];
-      for (let i = 0; i < 3; i++) c.D[d[i]] = c.L[l[i]];
-      for (let i = 0; i < 3; i++) c.L[l[i]] = t[i];
-    }
-  }
-
-  function applyMove(c, mv) {
-    const face = mv[0];
-    const turns = mv.endsWith("2") ? 2 : mv.endsWith("'") ? 3 : 1;
-    for (let i = 0; i < turns; i++) applyQuarter(c, face);
-  }
-
+  const cubeWorld = document.getElementById("cubeWorld");
+  const moveDescEl = document.getElementById("moveDesc");
+  const SPACING = 47;
+  let cubies = [];
   let visMoves = [];
   let visStep = 0;
-  let visTimer = null;
-  let visSpeed = 950;
+  let isAnimating = false;
+  let autoTimer = null;
+  let turnMs = 480;
+  let pauseMs = 950;
   let rotX = -26;
   let rotY = -36;
 
-  function render3DCube() {
-    const c = solvedCube();
-    for (let i = 0; i < visStep; i++) applyMove(c, visMoves[i]);
-    for (const f of ["U", "D", "F", "B", "L", "R"]) {
-      const el = document.getElementById("face" + f);
-      el.innerHTML = c[f]
-        .map(code => `<div class="sticker" style="background:${COLORS[code]}"></div>`)
-        .join("");
+  function buildSolvedCubies() {
+    cubeWorld.innerHTML = "";
+    cubies = [];
+    for (let x = -1; x <= 1; x++) {
+      for (let y = -1; y <= 1; y++) {
+        for (let z = -1; z <= 1; z++) {
+          const el = document.createElement("div");
+          el.className = "cubie";
+          const stickers = {};
+          if (y === -1) stickers.U = "U";
+          if (y === 1) stickers.D = "D";
+          if (z === 1) stickers.F = "F";
+          if (z === -1) stickers.B = "B";
+          if (x === -1) stickers.L = "L";
+          if (x === 1) stickers.R = "R";
+
+          const isCenter = Math.abs(x) + Math.abs(y) + Math.abs(z) === 1;
+          for (const f of ["U", "D", "F", "B", "L", "R"]) {
+            const faceDiv = document.createElement("div");
+            faceDiv.className = "cubie-face cf-" + f;
+            if (stickers[f]) {
+              const tile = document.createElement("div");
+              tile.className = "sticker-tile";
+              tile.style.background = FACE_HEX[stickers[f]];
+              if (isCenter) tile.textContent = f;
+              faceDiv.appendChild(tile);
+            }
+            el.appendChild(faceDiv);
+          }
+
+          const cubieObj = {
+            x,
+            y,
+            z,
+            mat: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+            el
+          };
+          updateCubieTransform(cubieObj);
+          cubeWorld.appendChild(el);
+          cubies.push(cubieObj);
+        }
+      }
     }
+  }
+
+  function updateCubieTransform(c) {
+    const m = c.mat;
+    const tx = c.x * SPACING;
+    const ty = c.y * SPACING;
+    const tz = c.z * SPACING;
+    c.el.style.transform =
+      `matrix3d(${m[0]},${m[3]},${m[6]},0, ${m[1]},${m[4]},${m[7]},0, ${m[2]},${m[5]},${m[8]},0, ${tx},${ty},${tz},1)`;
+  }
+
+  function matMul(a, b) {
+    return [
+      a[0]*b[0] + a[1]*b[3] + a[2]*b[6],
+      a[0]*b[1] + a[1]*b[4] + a[2]*b[7],
+      a[0]*b[2] + a[1]*b[5] + a[2]*b[8],
+      a[3]*b[0] + a[4]*b[3] + a[5]*b[6],
+      a[3]*b[1] + a[4]*b[4] + a[5]*b[7],
+      a[3]*b[2] + a[4]*b[5] + a[5]*b[8],
+      a[6]*b[0] + a[7]*b[3] + a[8]*b[6],
+      a[6]*b[1] + a[7]*b[4] + a[8]*b[7],
+      a[6]*b[2] + a[7]*b[5] + a[8]*b[8]
+    ];
+  }
+
+  function rotMatrix(axis, deg) {
+    const rad = (deg * Math.PI) / 180;
+    const c = Math.round(Math.cos(rad));
+    const s = Math.round(Math.sin(rad));
+    if (axis === "x") return [1, 0, 0, 0, c, -s, 0, s, c];
+    if (axis === "y") return [c, 0, s, 0, 1, 0, -s, 0, c];
+    return [c, -s, 0, s, c, 0, 0, 0, 1];
+  }
+
+  function parseMoveSpec(mv) {
+    const f = mv[0];
+    const dir = mv.endsWith("'") ? -1 : 1;
+    const mult = mv.endsWith("2") ? 2 : 1;
+    // CSS 3D coords: +X right, +Y down, +Z front
+    if (f === "U") return { axis: "y", filter: c => c.y === -1, deg: -90 * dir * mult };
+    if (f === "D") return { axis: "y", filter: c => c.y === 1, deg: 90 * dir * mult };
+    if (f === "R") return { axis: "x", filter: c => c.x === 1, deg: 90 * dir * mult };
+    if (f === "L") return { axis: "x", filter: c => c.x === -1, deg: -90 * dir * mult };
+    if (f === "F") return { axis: "z", filter: c => c.z === 1, deg: 90 * dir * mult };
+    return { axis: "z", filter: c => c.z === -1, deg: -90 * dir * mult };
+  }
+
+  function commitMoveInstant(mv) {
+    const spec = parseMoveSpec(mv);
+    const R = rotMatrix(spec.axis, spec.deg);
+    for (const c of cubies) {
+      if (!spec.filter(c)) continue;
+      const nx = Math.round(R[0] * c.x + R[1] * c.y + R[2] * c.z);
+      const ny = Math.round(R[3] * c.x + R[4] * c.y + R[5] * c.z);
+      const nz = Math.round(R[6] * c.x + R[7] * c.y + R[8] * c.z);
+      c.x = nx;
+      c.y = ny;
+      c.z = nz;
+      c.mat = matMul(R, c.mat);
+      updateCubieTransform(c);
+    }
+  }
+
+  function syncMovePills() {
     document.querySelectorAll(".move-pill").forEach((p, idx) => {
       p.classList.toggle("done", idx < visStep);
       p.classList.toggle("current", idx === visStep - 1);
     });
+    if (visStep === 0) {
+      moveDescEl.textContent = "Solved — Press Play or Step Forward";
+    } else {
+      const m = visMoves[visStep - 1];
+      moveDescEl.textContent = `Step ${visStep}/${visMoves.length}: ${m} — ${MOVE_TEXT[m] || ""}`;
+    }
   }
 
-  function stopVisPlay() {
-    if (visTimer) {
-      clearInterval(visTimer);
-      visTimer = null;
+  function animateSingleMove(mv, onDone) {
+    if (isAnimating) return;
+    isAnimating = true;
+    const spec = parseMoveSpec(mv);
+    const layer = cubies.filter(spec.filter);
+
+    const pivot = document.createElement("div");
+    pivot.style.position = "absolute";
+    pivot.style.transformStyle = "preserve-3d";
+    pivot.style.transition = `transform ${turnMs}ms cubic-bezier(0.25, 0.85, 0.35, 1)`;
+    pivot.style.transform = "rotate3d(0,0,0,0deg)";
+    cubeWorld.appendChild(pivot);
+    layer.forEach(c => pivot.appendChild(c.el));
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (spec.axis === "x") pivot.style.transform = `rotateX(${spec.deg}deg)`;
+        else if (spec.axis === "y") pivot.style.transform = `rotateY(${spec.deg}deg)`;
+        else pivot.style.transform = `rotateZ(${spec.deg}deg)`;
+      });
+    });
+
+    setTimeout(() => {
+      layer.forEach(c => cubeWorld.appendChild(c.el));
+      pivot.remove();
+      commitMoveInstant(mv);
+      isAnimating = false;
+      if (onDone) onDone();
+    }, turnMs + 25);
+  }
+
+  function stopAutoPlay() {
+    if (autoTimer) {
+      clearTimeout(autoTimer);
+      autoTimer = null;
     }
     document.getElementById("visPlayBtn").textContent = "▶ Play";
   }
 
+  function jumpToStep(target) {
+    stopAutoPlay();
+    if (isAnimating) return;
+    buildSolvedCubies();
+    for (let i = 0; i < target; i++) commitMoveInstant(visMoves[i]);
+    visStep = target;
+    syncMovePills();
+  }
+
+  function scheduleNextAuto() {
+    if (visStep >= visMoves.length) {
+      stopAutoPlay();
+      return;
+    }
+    const mv = visMoves[visStep];
+    visStep++;
+    syncMovePills();
+    animateSingleMove(mv, () => {
+      if (!autoTimer) return;
+      autoTimer = setTimeout(scheduleNextAuto, pauseMs);
+    });
+  }
+
   function openVisualizer() {
-    stopVisPlay();
+    stopAutoPlay();
     visMoves = currentScramble.split(" ").filter(Boolean);
     visStep = 0;
+    buildSolvedCubies();
     const pillsEl = document.getElementById("movePills");
     pillsEl.innerHTML = visMoves
       .map((m, idx) => `<span class="move-pill" data-idx="${idx + 1}">${m}</span>`)
       .join("");
     pillsEl.querySelectorAll(".move-pill").forEach(p => {
-      p.addEventListener("click", () => {
-        stopVisPlay();
-        visStep = Number(p.dataset.idx);
-        render3DCube();
-      });
+      p.addEventListener("click", () => jumpToStep(Number(p.dataset.idx)));
     });
-    render3DCube();
+    syncMovePills();
     document.getElementById("visModal").classList.add("open");
   }
 
+  // Drag-to-orbit 3D Cube
   const cubeStage = document.getElementById("cubeStage");
-  const cube3d = document.getElementById("cube3d");
   let dragging = false;
   let lastX = 0;
   let lastY = 0;
@@ -1242,56 +1372,45 @@ HTML_APP = r"""<!DOCTYPE html>
     rotX -= (e.clientY - lastY) * 0.6;
     lastX = e.clientX;
     lastY = e.clientY;
-    cube3d.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    cubeWorld.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
   });
   window.addEventListener("pointerup", () => (dragging = false));
 
-  document.getElementById("visResetBtn").addEventListener("click", () => {
-    stopVisPlay();
-    visStep = 0;
-    render3DCube();
-  });
+  document.getElementById("visResetBtn").addEventListener("click", () => jumpToStep(0));
   document.getElementById("visPrevBtn").addEventListener("click", () => {
-    stopVisPlay();
-    visStep = Math.max(0, visStep - 1);
-    render3DCube();
+    if (visStep > 0) jumpToStep(visStep - 1);
   });
   document.getElementById("visNextBtn").addEventListener("click", () => {
-    stopVisPlay();
-    visStep = Math.min(visMoves.length, visStep + 1);
-    render3DCube();
+    stopAutoPlay();
+    if (isAnimating || visStep >= visMoves.length) return;
+    const mv = visMoves[visStep];
+    visStep++;
+    syncMovePills();
+    animateSingleMove(mv);
   });
+
   document.getElementById("visPlayBtn").addEventListener("click", () => {
-    if (visTimer) {
-      stopVisPlay();
+    if (autoTimer) {
+      stopAutoPlay();
       return;
     }
-    if (visStep >= visMoves.length) visStep = 0;
+    if (isAnimating) return;
+    if (visStep >= visMoves.length) jumpToStep(0);
     document.getElementById("visPlayBtn").textContent = "⏸ Pause";
-    visTimer = setInterval(() => {
-      if (visStep >= visMoves.length) {
-        stopVisPlay();
-        return;
-      }
-      visStep++;
-      render3DCube();
-    }, visSpeed);
+    autoTimer = setTimeout(scheduleNextAuto, 120);
   });
 
   document.querySelectorAll(".speed-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      visSpeed = Number(btn.dataset.ms);
+      turnMs = Number(btn.dataset.turn);
+      pauseMs = Number(btn.dataset.pause);
       document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      if (visTimer) {
-        stopVisPlay();
-        document.getElementById("visPlayBtn").click();
-      }
     });
   });
 
   document.getElementById("closeVisBtn").addEventListener("click", () => {
-    stopVisPlay();
+    stopAutoPlay();
     document.getElementById("visModal").classList.remove("open");
   });
 
