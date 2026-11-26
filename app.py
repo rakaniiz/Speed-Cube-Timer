@@ -442,7 +442,7 @@ HTML_APP = r"""<!DOCTYPE html>
     padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 13px;
   }
 
   .section-label {
@@ -462,7 +462,7 @@ HTML_APP = r"""<!DOCTYPE html>
     display: flex;
     align-items: center;
     gap: 9px;
-    padding: 10px 11px;
+    padding: 9px 11px;
     border-radius: 10px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -486,14 +486,14 @@ HTML_APP = r"""<!DOCTYPE html>
   .color-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 7px;
   }
   .color-swatch-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    padding: 8px 6px;
+    padding: 7px 5px;
     border-radius: 10px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -523,7 +523,7 @@ HTML_APP = r"""<!DOCTYPE html>
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 9px 11px;
+    padding: 8px 11px;
     border-radius: 10px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -536,6 +536,36 @@ HTML_APP = r"""<!DOCTYPE html>
     border: none;
     background: transparent;
     cursor: pointer;
+  }
+
+  /* Scene Physics Sliders */
+  .slider-card {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .slider-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+    height: 4px;
   }
 
   .config-card {
@@ -840,6 +870,31 @@ HTML_APP = r"""<!DOCTYPE html>
       <span>Custom Color</span>
       <input type="color" id="customColorPicker" value="#38bdf8" />
     </div>
+
+    <div class="section-label">Scene Motion & Density</div>
+    <div class="slider-card">
+      <div class="slider-header">
+        <span id="sizeSliderLabel">Size</span>
+        <span class="slider-val" id="sizeSliderVal">1.0x</span>
+      </div>
+      <input type="range" id="sceneSizeSlider" min="0.4" max="2.2" step="0.1" value="1.0" />
+    </div>
+
+    <div class="slider-card">
+      <div class="slider-header">
+        <span id="speedSliderLabel">Speed</span>
+        <span class="slider-val" id="speedSliderVal">1.0x</span>
+      </div>
+      <input type="range" id="sceneSpeedSlider" min="0.2" max="2.5" step="0.1" value="1.0" />
+    </div>
+
+    <div class="slider-card">
+      <div class="slider-header">
+        <span id="intensitySliderLabel">Intensity</span>
+        <span class="slider-val" id="intensitySliderVal">100%</span>
+      </div>
+      <input type="range" id="sceneIntensitySlider" min="0.2" max="2.0" step="0.1" value="1.0" />
+    </div>
   </div>
 </aside>
 
@@ -852,7 +907,7 @@ HTML_APP = r"""<!DOCTYPE html>
   <div class="drawer-body">
     <div class="section-label">Interface</div>
     <div class="config-card">
-      <span>Show Text Labels ("Themes", "Config", "History")</span>
+      <span>Show Text Labels</span>
       <label class="switch">
         <input type="checkbox" id="toggleLabelsChk">
         <span class="slider"></span>
@@ -926,8 +981,8 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v8_solves";
-  const STORAGE_CFG = "cc_v8_cfg";
+  const STORAGE_SOLVES = "cc_v9_solves";
+  const STORAGE_CFG = "cc_v9_cfg";
 
   let cfg = {
     leftKey: "AltLeft",
@@ -935,7 +990,10 @@ HTML_APP = r"""<!DOCTYPE html>
     holdMs: 450,
     scene: "clouds",
     accentColor: "#38bdf8",
-    showLabels: false
+    showLabels: false,
+    sceneSize: 1.0,
+    sceneSpeed: 1.0,
+    sceneIntensity: 1.0
   };
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_CFG));
@@ -976,7 +1034,7 @@ HTML_APP = r"""<!DOCTYPE html>
     const w = canvas.width;
     const h = canvas.height;
 
-    particles = Array.from({ length: 58 }, () => ({
+    particles = Array.from({ length: 120 }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       r: Math.random() * 2 + 0.7,
@@ -986,20 +1044,20 @@ HTML_APP = r"""<!DOCTYPE html>
       a: Math.random() * 0.5 + 0.15
     }));
 
-    clouds = Array.from({ length: 9 }, (_, i) => ({
-      x: (i / 9) * (w + 400) - 200,
-      y: 55 + Math.random() * (h * 0.55),
-      scale: 0.7 + Math.random() * 0.85,
+    clouds = Array.from({ length: 18 }, (_, i) => ({
+      x: (i / 18) * (w + 500) - 250,
+      y: 45 + Math.random() * (h * 0.65),
+      scale: 0.65 + Math.random() * 0.85,
       speed: 0.14 + Math.random() * 0.22,
       alpha: 0.08 + Math.random() * 0.1
     }));
 
-    rainDrops = Array.from({ length: 135 }, () => ({
-      x: Math.random() * (w + 200),
+    rainDrops = Array.from({ length: 280 }, () => ({
+      x: Math.random() * (w + 260),
       y: Math.random() * h,
       len: 14 + Math.random() * 18,
       speed: 9 + Math.random() * 7,
-      alpha: 0.15 + Math.random() * 0.25
+      alpha: 0.16 + Math.random() * 0.25
     }));
 
     treesFar = [];
@@ -1034,7 +1092,7 @@ HTML_APP = r"""<!DOCTYPE html>
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(scale, scale);
-    ctx.fillStyle = `rgba(${Math.round((r + 255) / 2)}, ${Math.round((g + 255) / 2)}, ${Math.round((b + 255) / 2)}, ${alpha})`;
+    ctx.fillStyle = `rgba(${Math.round((r + 255) / 2)}, ${Math.round((g + 255) / 2)}, ${Math.round((b + 255) / 2)}, ${Math.min(0.45, alpha)})`;
     ctx.beginPath();
     ctx.arc(0, 0, 42, 0, Math.PI * 2);
     ctx.arc(38, -10, 50, 0, Math.PI * 2);
@@ -1066,46 +1124,66 @@ HTML_APP = r"""<!DOCTYPE html>
     const w = canvas.width;
     const h = canvas.height;
     const { r, g, b } = accentRgb;
+    const sz = cfg.sceneSize;
+    const sp = cfg.sceneSpeed;
+    const inten = cfg.sceneIntensity;
+
     ctx.clearRect(0, 0, w, h);
 
     if (cfg.scene === "clouds") {
       const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.16)`);
+      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${Math.min(0.35, 0.15 * inten)})`);
       grad.addColorStop(1, "rgba(7, 17, 32, 0.2)");
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
 
-      for (const c of clouds) {
-        c.x += c.speed;
-        if (c.x > w + 220) c.x = -240;
-        drawCloudShape(c.x, c.y, c.scale, c.alpha);
+      const activeCount = Math.max(2, Math.min(clouds.length, Math.round(9 * inten)));
+      for (let i = 0; i < activeCount; i++) {
+        const c = clouds[i];
+        c.x += c.speed * sp;
+        if (c.x > w + 260) c.x = -260;
+        drawCloudShape(c.x, c.y, c.scale * sz, c.alpha * Math.min(1.5, 0.7 + inten * 0.3));
       }
       return;
     }
 
     if (cfg.scene === "forest") {
-      const mist = ctx.createLinearGradient(0, h - 220, 0, h);
+      const mist = ctx.createLinearGradient(0, h - 220 * sz, 0, h);
       mist.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
-      mist.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.16)`);
+      mist.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${Math.min(0.35, 0.16 * inten)})`);
       ctx.fillStyle = mist;
-      ctx.fillRect(0, h - 220, w, 220);
+      ctx.fillRect(0, h - 220 * sz, w, 220 * sz);
 
       for (const t of treesFar) {
-        drawPineTree(t.x, h, t.width, t.height, `rgba(${Math.round(r * 0.14)}, ${Math.round(g * 0.22)}, ${Math.round(b * 0.18)}, 0.72)`);
+        drawPineTree(
+          t.x,
+          h,
+          t.width * (0.7 + sz * 0.3),
+          t.height * (0.65 + sz * 0.35),
+          `rgba(${Math.round(r * 0.14)}, ${Math.round(g * 0.22)}, ${Math.round(b * 0.18)}, 0.72)`
+        );
       }
       for (const t of treesNear) {
-        drawPineTree(t.x, h, t.width, t.height, `rgba(${Math.round(r * 0.08)}, ${Math.round(g * 0.14)}, ${Math.round(b * 0.11)}, 0.94)`);
+        drawPineTree(
+          t.x,
+          h,
+          t.width * (0.7 + sz * 0.3),
+          t.height * (0.65 + sz * 0.35),
+          `rgba(${Math.round(r * 0.08)}, ${Math.round(g * 0.14)}, ${Math.round(b * 0.11)}, 0.94)`
+        );
       }
 
-      for (const p of particles) {
-        p.x += p.vx + Math.sin(now * 0.001 + p.phase) * 0.18;
-        p.y += p.vy - 0.12;
+      const fireflyCount = Math.max(10, Math.min(particles.length, Math.round(50 * inten)));
+      for (let i = 0; i < fireflyCount; i++) {
+        const p = particles[i];
+        p.x += (p.vx + Math.sin(now * 0.001 + p.phase) * 0.18) * sp;
+        p.y += (p.vy - 0.12) * sp;
         if (p.x < 0) p.x = w;
         if (p.x > w) p.x = 0;
         if (p.y < 0) p.y = h - 40;
-        const glow = 0.25 + 0.45 * Math.abs(Math.sin(now * 0.002 + p.phase));
+        const glow = Math.min(0.95, (0.25 + 0.45 * Math.abs(Math.sin(now * 0.002 + p.phase))) * inten);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r + 0.6, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, (p.r + 0.6) * sz, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${glow})`;
         ctx.fill();
       }
@@ -1113,38 +1191,42 @@ HTML_APP = r"""<!DOCTYPE html>
     }
 
     if (cfg.scene === "rain") {
-      if (Math.random() < 0.0025) lightningAlpha = 0.14;
+      if (Math.random() < 0.0025 * inten) lightningAlpha = Math.min(0.26, 0.14 * inten);
       if (lightningAlpha > 0.002) {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${lightningAlpha})`;
         ctx.fillRect(0, 0, w, h);
         lightningAlpha *= 0.88;
       }
 
-      ctx.lineWidth = 1.15;
-      for (const d of rainDrops) {
-        d.x -= d.speed * 0.24;
-        d.y += d.speed;
+      ctx.lineWidth = Math.max(0.8, 1.15 * sz);
+      const dropCount = Math.max(25, Math.min(rainDrops.length, Math.round(135 * inten)));
+      for (let i = 0; i < dropCount; i++) {
+        const d = rainDrops[i];
+        const vy = d.speed * sp;
+        d.x -= vy * 0.24;
+        d.y += vy;
         if (d.y > h - 8) {
-          if (Math.random() < 0.25 && ripples.length < 35) {
+          if (Math.random() < 0.25 && ripples.length < Math.round(35 * inten)) {
             ripples.push({ x: d.x, y: h - 6 - Math.random() * 14, r: 1, a: 0.35 });
           }
           d.y = -20;
-          d.x = Math.random() * (w + 200);
+          d.x = Math.random() * (w + 260);
         }
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${d.alpha})`;
+        const scaledLen = d.len * sz;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(0.85, d.alpha * (0.65 + inten * 0.35))})`;
         ctx.beginPath();
         ctx.moveTo(d.x, d.y);
-        ctx.lineTo(d.x + d.len * 0.24, d.y - d.len);
+        ctx.lineTo(d.x + scaledLen * 0.24, d.y - scaledLen);
         ctx.stroke();
       }
 
       for (let i = ripples.length - 1; i >= 0; i--) {
         const rp = ripples[i];
-        rp.r += 0.65;
+        rp.r += 0.65 * sp;
         rp.a *= 0.93;
         ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${rp.a})`;
         ctx.beginPath();
-        ctx.ellipse(rp.x, rp.y, rp.r * 2.2, rp.r * 0.55, 0, 0, Math.PI * 2);
+        ctx.ellipse(rp.x, rp.y, rp.r * 2.2 * sz, rp.r * 0.55 * sz, 0, 0, Math.PI * 2);
         ctx.stroke();
         if (rp.a < 0.02) ripples.splice(i, 1);
       }
@@ -1152,32 +1234,36 @@ HTML_APP = r"""<!DOCTYPE html>
     }
 
     if (cfg.scene === "snow") {
-      for (const p of particles) {
-        p.y += 0.65 + p.r * 0.35;
-        p.x += Math.sin(now * 0.0012 + p.phase) * 0.45;
+      const flakeCount = Math.max(15, Math.min(particles.length, Math.round(60 * inten)));
+      for (let i = 0; i < flakeCount; i++) {
+        const p = particles[i];
+        p.y += (0.65 + p.r * 0.35) * sp;
+        p.x += Math.sin(now * 0.0012 + p.phase) * 0.45 * sp;
         if (p.y > h) {
           p.y = -10;
           p.x = Math.random() * w;
         }
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r + 0.8, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${Math.round((r + 255) / 2)}, ${Math.round((g + 255) / 2)}, ${Math.round((b + 255) / 2)}, ${p.a + 0.2})`;
+        ctx.arc(p.x, p.y, (p.r + 0.8) * sz, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${Math.round((r + 255) / 2)}, ${Math.round((g + 255) / 2)}, ${Math.round((b + 255) / 2)}, ${Math.min(0.95, p.a + 0.2)})`;
         ctx.fill();
       }
       return;
     }
 
     if (cfg.scene === "galaxy") {
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
+      const starCount = Math.max(15, Math.min(particles.length, Math.round(60 * inten)));
+      for (let i = 0; i < starCount; i++) {
+        const p = particles[i];
+        p.x += p.vx * sp;
+        p.y += p.vy * sp;
         if (p.x < 0) p.x = w;
         if (p.x > w) p.x = 0;
         if (p.y < 0) p.y = h;
         if (p.y > h) p.y = 0;
-        const twinkle = p.a * (0.65 + 0.35 * Math.sin(now * 0.003 + p.phase));
+        const twinkle = Math.min(0.95, p.a * (0.65 + 0.35 * Math.sin(now * 0.003 * sp + p.phase)) * inten);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.r * sz, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${twinkle})`;
         ctx.fill();
       }
@@ -1248,6 +1334,29 @@ HTML_APP = r"""<!DOCTYPE html>
     scrambleEl.textContent = currentScramble;
   }
 
+  function updateSliderLabels() {
+    const labelMap = {
+      rain: ["Drop Size", "Fall Speed", "Rain Intensity"],
+      clouds: ["Cloud Size", "Drift Speed", "Cloud Density"],
+      snow: ["Flake Size", "Fall Speed", "Snow Intensity"],
+      forest: ["Tree & Firefly Size", "Drift Speed", "Mist & Fireflies"],
+      galaxy: ["Star Size", "Drift Speed", "Star Density"],
+      minimal: ["Glow Scale", "Motion Speed", "Glow Intensity"]
+    };
+    const labels = labelMap[cfg.scene] || ["Size", "Speed", "Intensity"];
+    document.getElementById("sizeSliderLabel").textContent = labels[0];
+    document.getElementById("speedSliderLabel").textContent = labels[1];
+    document.getElementById("intensitySliderLabel").textContent = labels[2];
+
+    document.getElementById("sceneSizeSlider").value = cfg.sceneSize;
+    document.getElementById("sceneSpeedSlider").value = cfg.sceneSpeed;
+    document.getElementById("sceneIntensitySlider").value = cfg.sceneIntensity;
+
+    document.getElementById("sizeSliderVal").textContent = cfg.sceneSize.toFixed(1) + "x";
+    document.getElementById("speedSliderVal").textContent = cfg.sceneSpeed.toFixed(1) + "x";
+    document.getElementById("intensitySliderVal").textContent = Math.round(cfg.sceneIntensity * 100) + "%";
+  }
+
   function syncLabels() {
     document.body.dataset.scene = cfg.scene;
     document.body.classList.toggle("show-nav-labels", Boolean(cfg.showLabels));
@@ -1255,12 +1364,13 @@ HTML_APP = r"""<!DOCTYPE html>
 
     accentRgb = hexToRgb(cfg.accentColor);
     const { r, g, b } = accentRgb;
+    const inten = cfg.sceneIntensity;
     const root = document.documentElement.style;
     root.setProperty("--accent", cfg.accentColor);
     root.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
     root.setProperty("--accent-glow", `rgba(${r}, ${g}, ${b}, 0.38)`);
-    root.setProperty("--bg-glow-1", `rgba(${r}, ${g}, ${b}, 0.24)`);
-    root.setProperty("--bg-glow-2", `rgba(${r}, ${g}, ${b}, 0.14)`);
+    root.setProperty("--bg-glow-1", `rgba(${r}, ${g}, ${b}, ${Math.min(0.45, 0.24 * inten)})`);
+    root.setProperty("--bg-glow-2", `rgba(${r}, ${g}, ${b}, ${Math.min(0.35, 0.14 * inten)})`);
     document.getElementById("customColorPicker").value = cfg.accentColor;
 
     document.querySelectorAll(".scene-card").forEach(btn => {
@@ -1269,6 +1379,8 @@ HTML_APP = r"""<!DOCTYPE html>
     document.querySelectorAll(".color-swatch-btn").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.color.toLowerCase() === cfg.accentColor.toLowerCase());
     });
+
+    updateSliderLabels();
 
     document.getElementById("sensorLeftLabel").textContent = prettyKey(cfg.leftKey);
     document.getElementById("sensorRightLabel").textContent = prettyKey(cfg.rightKey);
@@ -1404,13 +1516,11 @@ HTML_APP = r"""<!DOCTYPE html>
       if (e.getModifierState("AltGraph")) rightDown = true;
     }
 
-    // Dual-hand stop: require BOTH keys down to end the run
     if (phase === "RUNNING") {
       if (leftDown && rightDown) stopRun();
       return;
     }
 
-    // Dual-hand start: require BOTH keys down to arm
     if (leftDown && rightDown && phase === "IDLE") {
       phase = "HOLDING";
       holdStart = performance.now();
@@ -1870,7 +1980,7 @@ HTML_APP = r"""<!DOCTYPE html>
   scrambleEl.addEventListener("click", openVisualizer);
   document.getElementById("newScrambleBtn").addEventListener("click", newScramble);
 
-  // Scene & Color Selection
+  // Scene, Color & Physics Sliders
   document.querySelectorAll(".scene-card").forEach(btn => {
     btn.addEventListener("click", () => {
       cfg.scene = btn.dataset.scene;
@@ -1887,6 +1997,21 @@ HTML_APP = r"""<!DOCTYPE html>
 
   document.getElementById("customColorPicker").addEventListener("input", e => {
     cfg.accentColor = e.target.value;
+    saveCfg();
+  });
+
+  document.getElementById("sceneSizeSlider").addEventListener("input", e => {
+    cfg.sceneSize = parseFloat(e.target.value);
+    saveCfg();
+  });
+
+  document.getElementById("sceneSpeedSlider").addEventListener("input", e => {
+    cfg.sceneSpeed = parseFloat(e.target.value);
+    saveCfg();
+  });
+
+  document.getElementById("sceneIntensitySlider").addEventListener("input", e => {
+    cfg.sceneIntensity = parseFloat(e.target.value);
     saveCfg();
   });
 
@@ -1940,6 +2065,9 @@ HTML_APP = r"""<!DOCTYPE html>
     cfg.showLabels = false;
     cfg.scene = "clouds";
     cfg.accentColor = "#38bdf8";
+    cfg.sceneSize = 1.0;
+    cfg.sceneSpeed = 1.0;
+    cfg.sceneIntensity = 1.0;
     bindingTarget = null;
     saveCfg();
   });
