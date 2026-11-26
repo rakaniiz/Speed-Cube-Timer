@@ -50,7 +50,7 @@ HTML_APP = r"""<!DOCTYPE html>
     --bg-glow-1: rgba(56, 189, 248, 0.14);
     --bg-glow-2: rgba(99, 102, 241, 0.12);
     --glass: rgba(15, 20, 32, 0.65);
-    --glass-strong: rgba(12, 16, 26, 0.9);
+    --glass-strong: rgba(12, 16, 26, 0.92);
     --surface: rgba(255, 255, 255, 0.05);
     --surface-hover: rgba(255, 255, 255, 0.1);
     --border: rgba(255, 255, 255, 0.12);
@@ -91,10 +91,50 @@ HTML_APP = r"""<!DOCTYPE html>
 
   body[data-theme="cyber"] {
     --bg-core: #050811;
-    --bg-glow-1: rgba(236, 72, 153, 0.22);
+    --bg-glow-1: rgba(236, 72, 153, 0.24);
     --bg-glow-2: rgba(16, 185, 129, 0.18);
     --accent: #f472b6;
     --accent-glow: rgba(244, 114, 182, 0.4);
+  }
+
+  body[data-theme="emerald"] {
+    --bg-core: #030e09;
+    --bg-glow-1: rgba(16, 185, 129, 0.24);
+    --bg-glow-2: rgba(5, 150, 105, 0.18);
+    --accent: #34d399;
+    --accent-glow: rgba(52, 211, 153, 0.38);
+  }
+
+  body[data-theme="solar"] {
+    --bg-core: #100b03;
+    --bg-glow-1: rgba(245, 158, 11, 0.24);
+    --bg-glow-2: rgba(234, 179, 8, 0.18);
+    --accent: #fbbf24;
+    --accent-glow: rgba(251, 191, 36, 0.38);
+  }
+
+  body[data-theme="sakura"] {
+    --bg-core: #12060c;
+    --bg-glow-1: rgba(244, 114, 182, 0.24);
+    --bg-glow-2: rgba(251, 113, 133, 0.2);
+    --accent: #f9a8d4;
+    --accent-glow: rgba(249, 168, 212, 0.38);
+  }
+
+  body[data-theme="void"] {
+    --bg-core: #070410;
+    --bg-glow-1: rgba(124, 58, 237, 0.26);
+    --bg-glow-2: rgba(79, 70, 229, 0.2);
+    --accent: #a78bfa;
+    --accent-glow: rgba(167, 139, 250, 0.4);
+  }
+
+  body[data-theme="crimson"] {
+    --bg-core: #120305;
+    --bg-glow-1: rgba(220, 38, 38, 0.26);
+    --bg-glow-2: rgba(153, 27, 27, 0.22);
+    --accent: #f87171;
+    --accent-glow: rgba(248, 113, 113, 0.4);
   }
 
   * {
@@ -216,9 +256,8 @@ HTML_APP = r"""<!DOCTYPE html>
 
   .nav-group {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
   }
 
   .pill-btn {
@@ -227,7 +266,7 @@ HTML_APP = r"""<!DOCTYPE html>
     border: 1px solid var(--border);
     padding: 6px 11px;
     border-radius: 9px;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -241,6 +280,12 @@ HTML_APP = r"""<!DOCTYPE html>
     border-color: var(--accent);
     background: rgba(255, 255, 255, 0.09);
     box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .icon-btn {
+    font-size: 1rem;
+    padding: 5px 10px;
+    line-height: 1.1;
   }
 
   main {
@@ -498,6 +543,44 @@ HTML_APP = r"""<!DOCTYPE html>
     color: var(--muted);
   }
 
+  /* Theme Grid */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .theme-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+  }
+  .theme-card:hover {
+    background: var(--surface-hover);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .theme-card.active {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 14px var(--accent-glow);
+  }
+  .theme-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+  }
+
   /* 27-Cubie Real 3D Rubik's Cube */
   .cube-stage {
     width: 100%;
@@ -619,11 +702,7 @@ HTML_APP = r"""<!DOCTYPE html>
     <button class="pill-btn" id="newScrambleBtn" title="New Scramble">↻</button>
   </div>
   <div class="nav-group">
-    <button class="pill-btn theme-btn" data-theme="obsidian">Obsidian</button>
-    <button class="pill-btn theme-btn active" data-theme="galaxy">Galaxy</button>
-    <button class="pill-btn theme-btn" data-theme="inferno">Inferno</button>
-    <button class="pill-btn theme-btn" data-theme="arctic">Arctic</button>
-    <button class="pill-btn theme-btn" data-theme="cyber">Cyber</button>
+    <button class="pill-btn icon-btn" id="themesBtn" title="Themes">🎨</button>
     <button class="pill-btn" id="configBtn">⚙ Keys</button>
     <button class="pill-btn" id="drawerBtn">Solves (<span id="solveCount">0</span>)</button>
   </div>
@@ -637,7 +716,7 @@ HTML_APP = r"""<!DOCTYPE html>
     <div class="sensor" id="sensorLeft"><span class="sensor-dot"></span><span id="sensorLeftLabel">Left Alt</span></div>
     <div class="sensor" id="sensorRight"><span class="sensor-dot"></span><span id="sensorRightLabel">Right Alt</span></div>
   </div>
-  <div class="hint" id="hintText">Hold both keys together until green, release to start • Space to stop</div>
+  <div class="hint" id="hintText">Hold both keys until green, release to start • Press both keys to stop</div>
 
   <div class="post-actions" id="postActions">
     <button class="pill-btn" id="btnPlus2">+2</button>
@@ -664,6 +743,28 @@ HTML_APP = r"""<!DOCTYPE html>
   </div>
   <div class="solve-list" id="solveList"></div>
 </aside>
+
+<!-- Themes Modal -->
+<div class="modal-backdrop" id="themesModal">
+  <div class="modal" style="width:410px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:600;font-size:0.95rem;">🎨 Select Theme</span>
+      <button class="pill-btn" id="closeThemesBtn" style="padding:4px 9px;">✕</button>
+    </div>
+    <div class="theme-grid" id="themeGrid">
+      <button class="theme-card" data-theme="obsidian"><span class="theme-swatch" style="background:linear-gradient(135deg,#0f172a,#38bdf8);"></span>Obsidian</button>
+      <button class="theme-card" data-theme="galaxy"><span class="theme-swatch" style="background:linear-gradient(135deg,#3b0764,#c084fc);"></span>Galaxy</button>
+      <button class="theme-card" data-theme="inferno"><span class="theme-swatch" style="background:linear-gradient(135deg,#7c2d12,#fb923c);"></span>Inferno</button>
+      <button class="theme-card" data-theme="arctic"><span class="theme-swatch" style="background:linear-gradient(135deg,#083344,#22d3ee);"></span>Arctic</button>
+      <button class="theme-card" data-theme="cyber"><span class="theme-swatch" style="background:linear-gradient(135deg,#831843,#10b981);"></span>Cyberpunk</button>
+      <button class="theme-card" data-theme="emerald"><span class="theme-swatch" style="background:linear-gradient(135deg,#064e3b,#34d399);"></span>Emerald Matrix</button>
+      <button class="theme-card" data-theme="solar"><span class="theme-swatch" style="background:linear-gradient(135deg,#78350f,#fbbf24);"></span>Solar Gold</button>
+      <button class="theme-card" data-theme="sakura"><span class="theme-swatch" style="background:linear-gradient(135deg,#701a75,#f9a8d4);"></span>Sakura</button>
+      <button class="theme-card" data-theme="void"><span class="theme-swatch" style="background:linear-gradient(135deg,#2e1065,#8b5cf6);"></span>Void Purple</button>
+      <button class="theme-card" data-theme="crimson"><span class="theme-swatch" style="background:linear-gradient(135deg,#7f1d1d,#f87171);"></span>Crimson Blood</button>
+    </div>
+  </div>
+</div>
 
 <!-- Key Configuration Modal -->
 <div class="modal-backdrop" id="configModal">
@@ -722,8 +823,8 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v5_solves";
-  const STORAGE_CFG = "cc_v5_cfg";
+  const STORAGE_SOLVES = "cc_v6_solves";
+  const STORAGE_CFG = "cc_v6_cfg";
 
   let cfg = { leftKey: "AltLeft", rightKey: "AltRight", holdMs: 450, theme: "galaxy" };
   try {
@@ -748,13 +849,13 @@ HTML_APP = r"""<!DOCTYPE html>
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  for (let i = 0; i < 44; i++) {
+  for (let i = 0; i < 48; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       r: Math.random() * 1.8 + 0.6,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: (Math.random() - 0.5) * 0.25,
+      vx: (Math.random() - 0.5) * 0.28,
+      vy: (Math.random() - 0.5) * 0.28,
       a: Math.random() * 0.45 + 0.1
     });
   }
@@ -766,7 +867,12 @@ HTML_APP = r"""<!DOCTYPE html>
       galaxy: "192, 132, 252",
       inferno: "251, 146, 60",
       arctic: "34, 211, 238",
-      cyber: "244, 114, 182"
+      cyber: "244, 114, 182",
+      emerald: "52, 211, 153",
+      solar: "251, 191, 36",
+      sakura: "249, 168, 212",
+      void: "167, 139, 250",
+      crimson: "248, 113, 113"
     };
     const rgb = colorMap[cfg.theme] || colorMap.galaxy;
     for (const p of particles) {
@@ -849,7 +955,7 @@ HTML_APP = r"""<!DOCTYPE html>
 
   function syncLabels() {
     document.body.dataset.theme = cfg.theme;
-    document.querySelectorAll(".theme-btn").forEach(b => {
+    document.querySelectorAll(".theme-card").forEach(b => {
       b.classList.toggle("active", b.dataset.theme === cfg.theme);
     });
     document.getElementById("sensorLeftLabel").textContent = prettyKey(cfg.leftKey);
@@ -905,6 +1011,7 @@ HTML_APP = r"""<!DOCTYPE html>
     blockUntilRelease = true;
     document.body.classList.remove("running");
     timerEl.textContent = formatMs(elapsed, null);
+    updateSensors();
 
     const id = Date.now();
     lastRunId = id;
@@ -967,13 +1074,9 @@ HTML_APP = r"""<!DOCTYPE html>
       e.stopPropagation();
     }
 
-    if (phase === "RUNNING") {
-      if (!e.repeat && (e.code === "Space" || hitLeft || hitRight)) stopRun();
-      return;
-    }
-
     if (blockUntilRelease) return;
 
+    // Update leftDown / rightDown consistently in both IDLE and RUNNING states
     if (
       e.code === "ControlLeft" &&
       cfg.leftKey !== "ControlLeft" &&
@@ -989,6 +1092,15 @@ HTML_APP = r"""<!DOCTYPE html>
       if (e.getModifierState("AltGraph")) rightDown = true;
     }
 
+    // Dual-hand stop: require BOTH keys down to end the run
+    if (phase === "RUNNING") {
+      if (leftDown && rightDown) {
+        stopRun();
+      }
+      return;
+    }
+
+    // Dual-hand start: require BOTH keys down to arm
     if (leftDown && rightDown && phase === "IDLE") {
       phase = "HOLDING";
       holdStart = performance.now();
@@ -1018,10 +1130,12 @@ HTML_APP = r"""<!DOCTYPE html>
     if (relRight) rightDown = false;
 
     if (blockUntilRelease) {
-      if (!leftDown && !rightDown && e.code !== "Space") blockUntilRelease = false;
+      if (!leftDown && !rightDown) blockUntilRelease = false;
       updateSensors();
       return;
     }
+
+    if (phase === "RUNNING") return;
 
     if (phase === "ARMED" && (!leftDown || !rightDown)) {
       startRun();
@@ -1240,7 +1354,6 @@ HTML_APP = r"""<!DOCTYPE html>
     const f = mv[0];
     const dir = mv.endsWith("'") ? -1 : 1;
     const mult = mv.endsWith("2") ? 2 : 1;
-    // CSS 3D coords: +X right, +Y down, +Z front
     if (f === "U") return { axis: "y", filter: c => c.y === -1, deg: -90 * dir * mult };
     if (f === "D") return { axis: "y", filter: c => c.y === 1, deg: 90 * dir * mult };
     if (f === "R") return { axis: "x", filter: c => c.x === 1, deg: 90 * dir * mult };
@@ -1419,7 +1532,15 @@ HTML_APP = r"""<!DOCTYPE html>
   scrambleEl.addEventListener("click", openVisualizer);
   document.getElementById("newScrambleBtn").addEventListener("click", newScramble);
 
-  document.querySelectorAll(".theme-btn").forEach(btn => {
+  // Themes Modal
+  const themesModal = document.getElementById("themesModal");
+  document.getElementById("themesBtn").addEventListener("click", () => themesModal.classList.add("open"));
+  document.getElementById("closeThemesBtn").addEventListener("click", () => themesModal.classList.remove("open"));
+  themesModal.addEventListener("click", e => {
+    if (e.target === themesModal) themesModal.classList.remove("open");
+  });
+
+  document.querySelectorAll(".theme-card").forEach(btn => {
     btn.addEventListener("click", () => {
       cfg.theme = btn.dataset.theme;
       saveCfg();
