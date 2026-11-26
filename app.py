@@ -47,25 +47,30 @@ HTML_APP = r"""<!DOCTYPE html>
 <style>
   :root {
     --bg-core: #07090f;
-    --bg-glow-1: rgba(56, 189, 248, 0.22);
-    --bg-glow-2: rgba(56, 189, 248, 0.14);
-    --glass: rgba(15, 20, 32, 0.65);
-    --glass-strong: rgba(12, 16, 26, 0.94);
+    --bg-glow-1: rgba(61, 174, 233, 0.22);
+    --bg-glow-2: rgba(61, 174, 233, 0.14);
+    --glass: rgba(20, 24, 33, 0.72);
+    --glass-strong: rgba(18, 22, 30, 0.94);
     --surface: rgba(255, 255, 255, 0.055);
     --surface-hover: rgba(255, 255, 255, 0.11);
-    --border: rgba(255, 255, 255, 0.12);
-    --text: #f8fafc;
-    --muted: #94a3b8;
-    --accent: #38bdf8;
-    --accent-rgb: 56, 189, 248;
-    --accent-glow: rgba(56, 189, 248, 0.36);
+    --border: rgba(255, 255, 255, 0.13);
+    --text: #eff0f1;
+    --muted: #9aa5b4;
+    --accent: #3daee9;
+    --accent-rgb: 61, 174, 233;
+    --accent-glow: rgba(61, 174, 233, 0.36);
     --cue-color: #ef4444;
     --cue-glow: rgba(239, 68, 68, 0.9);
-    --amber: #f59e0b;
-    --amber-glow: rgba(245, 158, 11, 0.35);
-    --green: #10b981;
-    --green-glow: rgba(16, 185, 129, 0.4);
-    --red: #ef4444;
+    --clock-color: #eff0f1;
+    --clock-bg-alpha: 0.55;
+    --clock-scale: 1;
+    --clock-font: 'JetBrains Mono', monospace;
+    --amber: #f67400;
+    --amber-glow: rgba(246, 116, 0, 0.35);
+    --green: #27ae60;
+    --green-glow: rgba(39, 174, 96, 0.4);
+    --red: #da4453;
+    --panel-radius: 10px;
   }
 
   body[data-scene="clouds"] { --bg-core: #0d1f36; }
@@ -135,20 +140,29 @@ HTML_APP = r"""<!DOCTYPE html>
     100% { transform: translate(35px, 25px) scale(1.08); }
   }
 
+  /* KDE Plasma Breeze Panel Header */
   header {
     position: relative;
     z-index: 30;
     width: 100%;
-    height: 58px;
+    height: 54px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 16px;
     background: var(--glass);
-    backdrop-filter: blur(18px);
+    backdrop-filter: blur(22px) saturate(140%);
     border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
     gap: 10px;
     transition: opacity 0.25s ease;
+  }
+
+  body.floating-panel header {
+    width: calc(100% - 24px);
+    margin: 10px auto 0 auto;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--border);
   }
 
   .brand {
@@ -156,15 +170,15 @@ HTML_APP = r"""<!DOCTYPE html>
     align-items: center;
     gap: 9px;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    font-size: 0.88rem;
+    letter-spacing: 0.06em;
+    font-size: 0.86rem;
   }
   .brand-dot {
-    width: 10px;
-    height: 10px;
+    width: 11px;
+    height: 11px;
     border-radius: 3px;
     background: var(--accent);
-    box-shadow: 0 0 14px var(--accent-glow);
+    box-shadow: 0 0 12px var(--accent-glow);
     transform: rotate(15deg);
   }
 
@@ -176,11 +190,11 @@ HTML_APP = r"""<!DOCTYPE html>
 
   .scramble-box {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.96rem;
+    font-size: 0.94rem;
     font-weight: 600;
     letter-spacing: 0.03em;
-    padding: 8px 14px;
-    border-radius: 10px;
+    padding: 7px 14px;
+    border-radius: 8px;
     background: var(--surface);
     border: 1px solid var(--border);
     cursor: pointer;
@@ -189,22 +203,22 @@ HTML_APP = r"""<!DOCTYPE html>
   .scramble-box:hover {
     background: var(--surface-hover);
     border-color: var(--accent);
-    box-shadow: 0 0 18px var(--accent-glow);
+    box-shadow: 0 0 16px var(--accent-glow);
   }
 
   .nav-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
   }
 
   .pill-btn {
     background: var(--surface);
     color: var(--muted);
     border: 1px solid var(--border);
-    padding: 6px 11px;
-    border-radius: 9px;
-    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.79rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -215,22 +229,23 @@ HTML_APP = r"""<!DOCTYPE html>
   .pill-btn:hover {
     background: var(--surface-hover);
     color: var(--text);
+    border-color: rgba(255, 255, 255, 0.24);
   }
   .pill-btn.active {
     color: var(--text);
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.09);
+    background: rgba(var(--accent-rgb), 0.18);
     box-shadow: 0 0 12px var(--accent-glow);
   }
 
   .emoji-nav-btn {
-    font-size: 1.05rem;
-    padding: 6px 11px;
+    font-size: 1.02rem;
+    padding: 6px 10px;
     line-height: 1.1;
     color: var(--text);
   }
   .nav-label {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 500;
     color: var(--muted);
     display: none;
@@ -252,6 +267,27 @@ HTML_APP = r"""<!DOCTYPE html>
     color: var(--accent);
   }
 
+  /* Docked Header Clock Option */
+  .docked-clock {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-family: var(--clock-font);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--clock-color);
+  }
+  body.clock-docked .docked-clock {
+    display: inline-flex;
+  }
+  body.clock-docked .clock-plasmoid {
+    display: none !important;
+  }
+
   main {
     position: relative;
     z-index: 5;
@@ -264,11 +300,132 @@ HTML_APP = r"""<!DOCTYPE html>
     padding: 16px;
   }
 
+  /* KDE Edit Mode Banner */
+  .edit-mode-bar {
+    position: fixed;
+    top: 66px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 35;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border-radius: 10px;
+    background: rgba(18, 22, 30, 0.92);
+    border: 1px solid var(--accent);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55), 0 0 18px var(--accent-glow);
+    font-size: 0.78rem;
+    color: var(--text);
+  }
+  body.edit-mode .edit-mode-bar {
+    display: flex;
+  }
+
+  /* Real-Life Clock Plasmoid Widget */
+  .clock-plasmoid {
+    position: fixed;
+    z-index: 20;
+    left: 24px;
+    top: 74px;
+    transform: scale(var(--clock-scale));
+    transform-origin: top left;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: rgba(18, 22, 30, var(--clock-bg-alpha));
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--border);
+    color: var(--clock-color);
+    font-family: var(--clock-font);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+  }
+  .clock-plasmoid.no-border {
+    border-color: transparent;
+    box-shadow: none;
+  }
+  .clock-plasmoid.hidden {
+    display: none;
+  }
+
+  body.edit-mode .clock-plasmoid {
+    cursor: grab;
+    border: 1.5px dashed var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18), 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+  }
+  body.edit-mode .clock-plasmoid:active {
+    cursor: grabbing;
+  }
+
+  .plasmoid-badge {
+    display: none;
+    position: absolute;
+    top: -11px;
+    left: 10px;
+    padding: 1px 7px;
+    border-radius: 5px;
+    background: var(--accent);
+    color: #060911;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  body.edit-mode .plasmoid-badge {
+    display: inline-block;
+  }
+
+  .clock-analog-wrap {
+    display: none;
+    width: 112px;
+    height: 112px;
+  }
+  .clock-plasmoid[data-style="analog"] .clock-analog-wrap,
+  .clock-plasmoid[data-style="hybrid"] .clock-analog-wrap {
+    display: block;
+  }
+  .clock-plasmoid[data-style="analog"] .clock-digital-time {
+    display: none;
+  }
+
+  .clock-digital-time {
+    font-size: 2.1rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+    white-space: nowrap;
+  }
+  .clock-ampm {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.8;
+    margin-left: 4px;
+  }
+  .clock-date-line {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.76rem;
+    font-weight: 500;
+    opacity: 0.78;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .clock-tz-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    opacity: 0.6;
+    text-transform: uppercase;
+  }
+
   .focus-banner {
     padding: 5px 14px;
     border-radius: 999px;
-    background: rgba(245, 158, 11, 0.14);
-    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: rgba(246, 116, 0, 0.14);
+    border: 1px solid rgba(246, 116, 0, 0.4);
     color: var(--amber);
     font-size: 0.76rem;
     margin-bottom: 12px;
@@ -348,7 +505,7 @@ HTML_APP = r"""<!DOCTYPE html>
   .sensor.down {
     border-color: var(--amber);
     color: var(--amber);
-    background: rgba(245, 158, 11, 0.13);
+    background: rgba(246, 116, 0, 0.13);
     box-shadow: 0 0 18px var(--amber-glow);
   }
   .sensor.down .sensor-dot {
@@ -358,7 +515,7 @@ HTML_APP = r"""<!DOCTYPE html>
   .sensor.armed {
     border-color: var(--green);
     color: var(--green);
-    background: rgba(16, 185, 129, 0.16);
+    background: rgba(39, 174, 96, 0.16);
     box-shadow: 0 0 22px var(--green-glow);
   }
   .sensor.armed .sensor-dot {
@@ -394,9 +551,9 @@ HTML_APP = r"""<!DOCTYPE html>
     display: flex;
     gap: 20px;
     padding: 9px 20px;
-    border-radius: 13px;
+    border-radius: var(--panel-radius);
     background: var(--glass);
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(18px);
     border: 1px solid var(--border);
     font-size: 0.8rem;
     color: var(--muted);
@@ -409,27 +566,35 @@ HTML_APP = r"""<!DOCTYPE html>
     font-weight: 700;
   }
 
-  /* Unified Right-Side Slide-Out Drawers (Themes, Config, History) */
+  /* KDE Plasma Right-Side Slide-Out Drawers */
   .side-drawer {
     position: fixed;
-    top: 58px;
+    top: 54px;
     right: 0;
     bottom: 0;
-    width: 345px;
-    max-width: 92vw;
+    width: 365px;
+    max-width: 94vw;
     background: var(--glass-strong);
-    backdrop-filter: blur(22px);
+    backdrop-filter: blur(24px) saturate(140%);
     border-left: 1px solid var(--border);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.45);
     transform: translateX(100%);
     transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
     display: flex;
     flex-direction: column;
     z-index: 25;
   }
+  body.floating-panel .side-drawer {
+    top: 72px;
+    right: 12px;
+    bottom: 12px;
+    border-radius: var(--panel-radius);
+    border: 1px solid var(--border);
+  }
   .side-drawer.open { transform: translateX(0); }
 
   .drawer-head {
-    padding: 14px 16px;
+    padding: 13px 16px;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
@@ -444,15 +609,16 @@ HTML_APP = r"""<!DOCTYPE html>
     padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 11px;
   }
 
   .section-label {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    font-weight: 600;
+    letter-spacing: 0.09em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 4px;
   }
 
   .scene-grid {
@@ -465,7 +631,7 @@ HTML_APP = r"""<!DOCTYPE html>
     align-items: center;
     gap: 9px;
     padding: 9px 11px;
-    border-radius: 10px;
+    border-radius: 9px;
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
@@ -481,7 +647,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
   .scene-card.active {
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(var(--accent-rgb), 0.18);
     box-shadow: 0 0 14px var(--accent-glow);
   }
 
@@ -496,7 +662,7 @@ HTML_APP = r"""<!DOCTYPE html>
     align-items: center;
     gap: 5px;
     padding: 7px 5px;
-    border-radius: 10px;
+    border-radius: 9px;
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--muted);
@@ -511,7 +677,7 @@ HTML_APP = r"""<!DOCTYPE html>
   .color-swatch-btn.active {
     border-color: var(--accent);
     color: var(--text);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(var(--accent-rgb), 0.16);
     box-shadow: 0 0 12px var(--accent-glow);
   }
   .swatch-dot {
@@ -521,16 +687,18 @@ HTML_APP = r"""<!DOCTYPE html>
     border: 2px solid rgba(255, 255, 255, 0.35);
   }
 
-  .custom-color-row {
+  .custom-color-row,
+  .config-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 11px;
-    border-radius: 10px;
+    padding: 9px 12px;
+    border-radius: 9px;
     background: var(--surface);
     border: 1px solid var(--border);
     font-size: 0.81rem;
     color: var(--muted);
+    gap: 10px;
   }
   input[type="color"] {
     width: 34px;
@@ -540,13 +708,58 @@ HTML_APP = r"""<!DOCTYPE html>
     cursor: pointer;
   }
 
-  /* Scene Physics Sliders */
+  select.breeze-select {
+    background: rgba(10, 14, 22, 0.9);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 5px 8px;
+    font-size: 0.78rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    outline: none;
+  }
+  select.breeze-select:focus {
+    border-color: var(--accent);
+  }
+
+  /* 3x3 Anchor Grid for Clock Placement */
+  .anchor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 28px);
+    gap: 4px;
+  }
+  .anchor-btn {
+    width: 28px;
+    height: 22px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.65rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .anchor-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+  .anchor-btn.active {
+    background: var(--accent);
+    color: #060911;
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Sliders */
   .slider-card {
     display: flex;
     flex-direction: column;
     gap: 7px;
-    padding: 10px 12px;
-    border-radius: 10px;
+    padding: 9px 12px;
+    border-radius: 9px;
     background: var(--surface);
     border: 1px solid var(--border);
   }
@@ -559,7 +772,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
   .slider-val {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.76rem;
+    font-size: 0.75rem;
     color: var(--accent);
     font-weight: 600;
   }
@@ -568,19 +781,6 @@ HTML_APP = r"""<!DOCTYPE html>
     accent-color: var(--accent);
     cursor: pointer;
     height: 4px;
-  }
-
-  .config-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 11px 12px;
-    border-radius: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    font-size: 0.82rem;
-    color: var(--muted);
-    gap: 10px;
   }
 
   /* Toggle Switch */
@@ -632,7 +832,7 @@ HTML_APP = r"""<!DOCTYPE html>
     align-items: center;
     justify-content: space-between;
     padding: 8px 11px;
-    border-radius: 9px;
+    border-radius: 8px;
     background: var(--surface);
     border: 1px solid transparent;
     font-family: 'JetBrains Mono', monospace;
@@ -671,9 +871,9 @@ HTML_APP = r"""<!DOCTYPE html>
   .modal {
     width: 500px;
     max-width: 94vw;
-    background: #0f1422;
+    background: #12161f;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 14px;
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -681,7 +881,6 @@ HTML_APP = r"""<!DOCTYPE html>
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
   }
 
-  /* 27-Cubie Real 3D Rubik's Cube */
   .cube-stage {
     position: relative;
     width: 100%;
@@ -691,14 +890,13 @@ HTML_APP = r"""<!DOCTYPE html>
     justify-content: center;
     perspective: 820px;
     background: radial-gradient(circle at center, rgba(255,255,255,0.04), rgba(0,0,0,0.45));
-    border-radius: 13px;
+    border-radius: 11px;
     border: 1px solid var(--border);
     cursor: grab;
     overflow: hidden;
   }
   .cube-stage:active { cursor: grabbing; }
 
-  /* Borderless Cube-Sized Notation Overlay in Front of the 3D Z-plane */
   .move-cue-overlay {
     position: absolute;
     inset: 0;
@@ -818,7 +1016,12 @@ HTML_APP = r"""<!DOCTYPE html>
 
   body.running header,
   body.running .stats-dock,
-  body.running .post-actions {
+  body.running .post-actions,
+  body.running .edit-mode-bar {
+    opacity: 0;
+    pointer-events: none;
+  }
+  body.running.hide-clock-running .clock-plasmoid {
     opacity: 0;
     pointer-events: none;
   }
@@ -837,6 +1040,10 @@ HTML_APP = r"""<!DOCTYPE html>
     <button class="pill-btn" id="newScrambleBtn" title="New Scramble">↻</button>
   </div>
   <div class="nav-group">
+    <div class="docked-clock" id="dockedClock">00:00</div>
+    <button class="pill-btn emoji-nav-btn" id="editModeNavBtn" title="Edit Widgets">
+      <span>🧩</span><span class="nav-label">Edit</span>
+    </button>
     <button class="pill-btn emoji-nav-btn" id="themesNavBtn" data-drawer="themesDrawer" title="Themes">
       <span>🎨</span><span class="nav-label">Themes</span>
     </button>
@@ -848,6 +1055,30 @@ HTML_APP = r"""<!DOCTYPE html>
     </button>
   </div>
 </header>
+
+<!-- KDE Edit Mode Floating Bar -->
+<div class="edit-mode-bar" id="editModeBar">
+  <span>🧩 <b>Desktop Edit Mode</b> — Drag the Clock widget anywhere on screen</span>
+  <button class="pill-btn active" id="exitEditModeBtn" style="padding:3px 9px;">Done</button>
+</div>
+
+<!-- Customizable Real-Life Clock Plasmoid -->
+<div class="clock-plasmoid" id="clockPlasmoid" data-style="digital">
+  <span class="plasmoid-badge">CLOCK WIDGET</span>
+  <div class="clock-analog-wrap">
+    <svg viewBox="0 0 120 120" width="112" height="112">
+      <circle cx="60" cy="60" r="54" fill="rgba(0,0,0,0.22)" stroke="currentColor" stroke-opacity="0.35" stroke-width="2.5"/>
+      <g id="analogTicks" stroke="currentColor" stroke-opacity="0.55" stroke-width="2" stroke-linecap="round"></g>
+      <line id="handHour" x1="60" y1="60" x2="60" y2="30" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+      <line id="handMin" x1="60" y1="60" x2="60" y2="18" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+      <line id="handSec" x1="60" y1="66" x2="60" y2="14" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="60" cy="60" r="3.5" fill="var(--accent)"/>
+    </svg>
+  </div>
+  <div class="clock-digital-time" id="clockDigitalTime">00:00:00</div>
+  <div class="clock-date-line" id="clockDateLine">Thursday, Nov 26, 2026</div>
+  <div class="clock-tz-tag" id="clockTzTag">LOCAL</div>
+</div>
 
 <main id="stage" tabindex="0">
   <div class="focus-banner">Click anywhere on the timer once to focus keyboard input</div>
@@ -891,21 +1122,21 @@ HTML_APP = r"""<!DOCTYPE html>
       <button class="scene-card" data-scene="minimal"><span>🌑</span>Minimal</button>
     </div>
 
-    <div class="section-label">Scene & Accent Color</div>
+    <div class="section-label">Plasma Accent Color</div>
     <div class="color-grid">
-      <button class="color-swatch-btn" data-color="#38bdf8"><span class="swatch-dot" style="background:#38bdf8;"></span>Sky</button>
+      <button class="color-swatch-btn" data-color="#3daee9"><span class="swatch-dot" style="background:#3daee9;"></span>Breeze</button>
       <button class="color-swatch-btn" data-color="#c084fc"><span class="swatch-dot" style="background:#c084fc;"></span>Violet</button>
       <button class="color-swatch-btn" data-color="#fb923c"><span class="swatch-dot" style="background:#fb923c;"></span>Inferno</button>
-      <button class="color-swatch-btn" data-color="#34d399"><span class="swatch-dot" style="background:#34d399;"></span>Emerald</button>
+      <button class="color-swatch-btn" data-color="#27ae60"><span class="swatch-dot" style="background:#27ae60;"></span>Emerald</button>
       <button class="color-swatch-btn" data-color="#fbbf24"><span class="swatch-dot" style="background:#fbbf24;"></span>Gold</button>
       <button class="color-swatch-btn" data-color="#f472b6"><span class="swatch-dot" style="background:#f472b6;"></span>Sakura</button>
-      <button class="color-swatch-btn" data-color="#f87171"><span class="swatch-dot" style="background:#f87171;"></span>Crimson</button>
-      <button class="color-swatch-btn" data-color="#e2e8f0"><span class="swatch-dot" style="background:#e2e8f0;"></span>Frost</button>
+      <button class="color-swatch-btn" data-color="#da4453"><span class="swatch-dot" style="background:#da4453;"></span>Crimson</button>
+      <button class="color-swatch-btn" data-color="#eff0f1"><span class="swatch-dot" style="background:#eff0f1;"></span>Frost</button>
     </div>
 
     <div class="custom-color-row">
-      <span>Custom Color</span>
-      <input type="color" id="customColorPicker" value="#38bdf8" />
+      <span>Custom Accent</span>
+      <input type="color" id="customColorPicker" value="#3daee9" />
     </div>
 
     <div class="section-label">Scene Motion & Density</div>
@@ -942,13 +1173,132 @@ HTML_APP = r"""<!DOCTYPE html>
     <button class="pill-btn close-drawer-btn" style="padding:3px 8px;">✕</button>
   </div>
   <div class="drawer-body">
-    <div class="section-label">Interface</div>
+    <div class="section-label">Plasma Workspace</div>
+    <div class="config-card">
+      <span>Edit Widget Layout</span>
+      <button class="pill-btn" id="toggleEditFromConfigBtn">🧩 Toggle</button>
+    </div>
+    <div class="config-card">
+      <span>Floating Top Panel</span>
+      <label class="switch">
+        <input type="checkbox" id="toggleFloatingPanelChk">
+        <span class="slider"></span>
+      </label>
+    </div>
     <div class="config-card">
       <span>Show Text Labels</span>
       <label class="switch">
         <input type="checkbox" id="toggleLabelsChk">
         <span class="slider"></span>
       </label>
+    </div>
+
+    <div class="section-label">🕒 Real-Life Clock Widget</div>
+    <div class="config-card">
+      <span>Show Clock</span>
+      <label class="switch">
+        <input type="checkbox" id="clockEnabledChk" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="config-card">
+      <span>Clock Mode</span>
+      <div style="display:flex;gap:4px;">
+        <button class="pill-btn clock-style-btn active" data-style="digital">Digital</button>
+        <button class="pill-btn clock-style-btn" data-style="analog">Analog</button>
+        <button class="pill-btn clock-style-btn" data-style="hybrid">Both</button>
+      </div>
+    </div>
+    <div class="config-card">
+      <span>Location</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="pill-btn" id="dockClockBtn" style="padding:4px 8px;font-size:0.74rem;">Dock Top</button>
+        <div class="anchor-grid" id="clockAnchorGrid" title="Snap Clock Position">
+          <button class="anchor-btn" data-pos="tl">↖</button>
+          <button class="anchor-btn" data-pos="tc">↑</button>
+          <button class="anchor-btn" data-pos="tr">↗</button>
+          <button class="anchor-btn" data-pos="ml">←</button>
+          <button class="anchor-btn" data-pos="mc">•</button>
+          <button class="anchor-btn" data-pos="mr">→</button>
+          <button class="anchor-btn" data-pos="bl">↙</button>
+          <button class="anchor-btn" data-pos="bc">↓</button>
+          <button class="anchor-btn" data-pos="br">↘</button>
+        </div>
+      </div>
+    </div>
+    <div class="config-card">
+      <span>Timezone</span>
+      <select class="breeze-select" id="clockTzSelect">
+        <option value="local">Local System</option>
+        <option value="UTC">UTC</option>
+        <option value="Europe/Madrid">Madrid / CET</option>
+        <option value="Europe/Istanbul">Istanbul / TRT</option>
+        <option value="Europe/London">London / GMT</option>
+        <option value="America/New_York">New York / EST</option>
+        <option value="America/Los_Angeles">Los Angeles / PST</option>
+        <option value="Asia/Tokyo">Tokyo / JST</option>
+      </select>
+    </div>
+    <div class="config-card">
+      <span>Font Style</span>
+      <select class="breeze-select" id="clockFontSelect">
+        <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+        <option value="'Inter', sans-serif">Inter Sans</option>
+        <option value="system-ui, sans-serif">System UI</option>
+      </select>
+    </div>
+    <div class="config-card">
+      <span>24-Hour Format</span>
+      <label class="switch">
+        <input type="checkbox" id="clock24hChk" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="config-card">
+      <span>Show Seconds</span>
+      <label class="switch">
+        <input type="checkbox" id="clockSecChk" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="config-card">
+      <span>Show Date</span>
+      <label class="switch">
+        <input type="checkbox" id="clockDateChk" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="config-card">
+      <span>Card Border</span>
+      <label class="switch">
+        <input type="checkbox" id="clockBorderChk" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="config-card">
+      <span>Hide While Solving</span>
+      <label class="switch">
+        <input type="checkbox" id="clockHideRunChk">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="config-card">
+      <span>Clock Color</span>
+      <input type="color" id="clockColorPicker" value="#eff0f1" />
+    </div>
+    <div class="slider-card">
+      <div class="slider-header">
+        <span>Clock Scale</span>
+        <span class="slider-val" id="clockScaleVal">1.0x</span>
+      </div>
+      <input type="range" id="clockScaleSlider" min="0.6" max="1.8" step="0.05" value="1.0" />
+    </div>
+    <div class="slider-card">
+      <div class="slider-header">
+        <span>Card Background Opacity</span>
+        <span class="slider-val" id="clockOpacityVal">55%</span>
+      </div>
+      <input type="range" id="clockOpacitySlider" min="0" max="0.95" step="0.05" value="0.55" />
     </div>
 
     <div class="section-label">3D Move Notation</div>
@@ -1034,22 +1384,41 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v12_solves";
-  const STORAGE_CFG = "cc_v12_cfg";
+  const STORAGE_SOLVES = "cc_v13_solves";
+  const STORAGE_CFG = "cc_v13_cfg";
 
-  let cfg = {
+  const DEFAULT_CFG = {
     leftKey: "AltLeft",
     rightKey: "AltRight",
     holdMs: 450,
     scene: "clouds",
-    accentColor: "#38bdf8",
+    accentColor: "#3daee9",
+    floatingPanel: false,
     showLabels: false,
     showNotation: true,
     notationColor: "#ef4444",
     sceneSize: 1.0,
     sceneSpeed: 1.0,
-    sceneIntensity: 1.0
+    sceneIntensity: 1.0,
+    clockEnabled: true,
+    clockStyle: "digital",
+    clockDocked: false,
+    clockXRatio: 0.02,
+    clockYRatio: 0.1,
+    clockAnchor: "tl",
+    clockTz: "local",
+    clockFont: "'JetBrains Mono', monospace",
+    clock24h: true,
+    clockSeconds: true,
+    clockDate: true,
+    clockBorder: true,
+    clockHideRunning: false,
+    clockColor: "#eff0f1",
+    clockScale: 1.0,
+    clockOpacity: 0.55
   };
+
+  let cfg = { ...DEFAULT_CFG };
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_CFG));
     if (saved) cfg = { ...cfg, ...saved };
@@ -1072,6 +1441,168 @@ HTML_APP = r"""<!DOCTYPE html>
   }
 
   let accentRgb = hexToRgb(cfg.accentColor);
+
+  // Build Analog Clock Dial Ticks
+  const analogTicksEl = document.getElementById("analogTicks");
+  for (let i = 0; i < 12; i++) {
+    const angle = i * 30;
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", "60");
+    line.setAttribute("y1", i % 3 === 0 ? "9" : "11");
+    line.setAttribute("x2", "60");
+    line.setAttribute("y2", i % 3 === 0 ? "17" : "15");
+    line.setAttribute("transform", `rotate(${angle} 60 60)`);
+    analogTicksEl.appendChild(line);
+  }
+
+  // Real-Life Clock Engine & Drag Placement
+  const clockEl = document.getElementById("clockPlasmoid");
+  const dockedClockEl = document.getElementById("dockedClock");
+  const clockDigitalEl = document.getElementById("clockDigitalTime");
+  const clockDateEl = document.getElementById("clockDateLine");
+  const clockTzEl = document.getElementById("clockTzTag");
+  const handHourEl = document.getElementById("handHour");
+  const handMinEl = document.getElementById("handMin");
+  const handSecEl = document.getElementById("handSec");
+
+  function positionClockFromRatios() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const rect = clockEl.getBoundingClientRect();
+    const maxX = Math.max(8, w - (rect.width || 180) - 8);
+    const maxY = Math.max(64, h - (rect.height || 90) - 8);
+    const px = Math.min(maxX, Math.max(8, cfg.clockXRatio * w));
+    const py = Math.min(maxY, Math.max(64, cfg.clockYRatio * h));
+    clockEl.style.left = px + "px";
+    clockEl.style.top = py + "px";
+  }
+
+  function snapClockToAnchor(pos) {
+    cfg.clockDocked = false;
+    cfg.clockAnchor = pos;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const rect = clockEl.getBoundingClientRect();
+    const cw = rect.width || 190;
+    const ch = rect.height || 90;
+    const padX = 22;
+    const topY = 74;
+    const botY = Math.max(topY, h - ch - 24);
+    const midY = Math.max(topY, (h - ch) / 2);
+
+    let x = padX;
+    let y = topY;
+    if (pos.endsWith("c")) x = Math.max(padX, (w - cw) / 2);
+    if (pos.endsWith("r")) x = Math.max(padX, w - cw - padX);
+    if (pos.startsWith("m")) y = midY;
+    if (pos.startsWith("b")) y = botY;
+
+    cfg.clockXRatio = x / w;
+    cfg.clockYRatio = y / h;
+    saveCfg();
+  }
+
+  function updateRealLifeClock() {
+    const now = new Date();
+    const tzOption = cfg.clockTz === "local" ? undefined : cfg.clockTz;
+
+    let partsMap = {};
+    try {
+      const fmt = new Intl.DateTimeFormat("en-US", {
+        timeZone: tzOption,
+        hour12: !cfg.clock24h,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+      for (const p of fmt.formatToParts(now)) {
+        partsMap[p.type] = p.value;
+      }
+    } catch (e) {
+      partsMap = {
+        hour: String(now.getHours()).padStart(2, "0"),
+        minute: String(now.getMinutes()).padStart(2, "0"),
+        second: String(now.getSeconds()).padStart(2, "0"),
+        weekday: "Day",
+        month: "Mon",
+        day: String(now.getDate()),
+        year: String(now.getFullYear())
+      };
+    }
+
+    const hh = partsMap.hour || "00";
+    const mm = partsMap.minute || "00";
+    const ss = partsMap.second || "00";
+    const dayPeriod = !cfg.clock24h && partsMap.dayPeriod ? `<span class="clock-ampm">${partsMap.dayPeriod}</span>` : "";
+
+    const timeStr = cfg.clockSeconds ? `${hh}:${mm}:${ss}` : `${hh}:${mm}`;
+    clockDigitalEl.innerHTML = timeStr + dayPeriod;
+    dockedClockEl.textContent = cfg.clockSeconds ? `${hh}:${mm}:${ss}` : `${hh}:${mm}`;
+
+    clockDateEl.style.display = cfg.clockDate ? "block" : "none";
+    clockDateEl.textContent = `${partsMap.weekday}, ${partsMap.month} ${partsMap.day}, ${partsMap.year}`;
+
+    clockTzEl.style.display = cfg.clockTz === "local" ? "none" : "block";
+    clockTzEl.textContent = cfg.clockTz.replace("_", " ");
+
+    // Analog hands
+    const hNum = parseInt(hh, 10) % 12;
+    const mNum = parseInt(mm, 10);
+    const sNum = parseInt(ss, 10);
+    const secDeg = sNum * 6;
+    const minDeg = mNum * 6 + sNum * 0.1;
+    const hourDeg = hNum * 30 + mNum * 0.5;
+
+    handSecEl.style.display = cfg.clockSeconds ? "block" : "none";
+    handSecEl.setAttribute("transform", `rotate(${secDeg} 60 60)`);
+    handMinEl.setAttribute("transform", `rotate(${minDeg} 60 60)`);
+    handHourEl.setAttribute("transform", `rotate(${hourDeg} 60 60)`);
+  }
+
+  // Drag Clock Plasmoid in Edit Mode
+  let editMode = false;
+  let draggingClock = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  clockEl.addEventListener("pointerdown", e => {
+    if (!editMode) return;
+    draggingClock = true;
+    const rect = clockEl.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+    clockEl.setPointerCapture(e.pointerId);
+  });
+
+  window.addEventListener("pointermove", e => {
+    if (!draggingClock) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const rect = clockEl.getBoundingClientRect();
+    const nx = Math.min(w - rect.width - 8, Math.max(8, e.clientX - dragOffsetX));
+    const ny = Math.min(h - rect.height - 8, Math.max(62, e.clientY - dragOffsetY));
+    clockEl.style.left = nx + "px";
+    clockEl.style.top = ny + "px";
+    cfg.clockXRatio = nx / w;
+    cfg.clockYRatio = ny / h;
+    cfg.clockAnchor = "custom";
+  });
+
+  window.addEventListener("pointerup", () => {
+    if (!draggingClock) return;
+    draggingClock = false;
+    saveCfg();
+  });
+
+  function setEditMode(active) {
+    editMode = active;
+    document.body.classList.toggle("edit-mode", editMode);
+    document.getElementById("editModeNavBtn").classList.toggle("active", editMode);
+  }
 
   // Procedural Scenic & Atmospheric Background Canvas
   const canvas = document.getElementById("bgCanvas");
@@ -1138,6 +1669,7 @@ HTML_APP = r"""<!DOCTYPE html>
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     initSceneEntities();
+    positionClockFromRatios();
   }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
@@ -1414,10 +1946,42 @@ HTML_APP = r"""<!DOCTYPE html>
 
   function syncLabels() {
     document.body.dataset.scene = cfg.scene;
+    document.body.classList.toggle("floating-panel", Boolean(cfg.floatingPanel));
     document.body.classList.toggle("show-nav-labels", Boolean(cfg.showLabels));
+    document.body.classList.toggle("clock-docked", Boolean(cfg.clockEnabled && cfg.clockDocked));
+    document.body.classList.toggle("hide-clock-running", Boolean(cfg.clockHideRunning));
+
+    document.getElementById("toggleFloatingPanelChk").checked = Boolean(cfg.floatingPanel);
     document.getElementById("toggleLabelsChk").checked = Boolean(cfg.showLabels);
     document.getElementById("toggleNotationChk").checked = Boolean(cfg.showNotation);
     document.getElementById("notationColorPicker").value = cfg.notationColor;
+
+    // Clock UI sync
+    document.getElementById("clockEnabledChk").checked = Boolean(cfg.clockEnabled);
+    document.getElementById("clock24hChk").checked = Boolean(cfg.clock24h);
+    document.getElementById("clockSecChk").checked = Boolean(cfg.clockSeconds);
+    document.getElementById("clockDateChk").checked = Boolean(cfg.clockDate);
+    document.getElementById("clockBorderChk").checked = Boolean(cfg.clockBorder);
+    document.getElementById("clockHideRunChk").checked = Boolean(cfg.clockHideRunning);
+    document.getElementById("clockTzSelect").value = cfg.clockTz;
+    document.getElementById("clockFontSelect").value = cfg.clockFont;
+    document.getElementById("clockColorPicker").value = cfg.clockColor;
+    document.getElementById("clockScaleSlider").value = cfg.clockScale;
+    document.getElementById("clockScaleVal").textContent = Number(cfg.clockScale).toFixed(2) + "x";
+    document.getElementById("clockOpacitySlider").value = cfg.clockOpacity;
+    document.getElementById("clockOpacityVal").textContent = Math.round(cfg.clockOpacity * 100) + "%";
+
+    clockEl.classList.toggle("hidden", !cfg.clockEnabled);
+    clockEl.classList.toggle("no-border", !cfg.clockBorder);
+    clockEl.dataset.style = cfg.clockStyle;
+    document.getElementById("dockClockBtn").classList.toggle("active", Boolean(cfg.clockDocked));
+
+    document.querySelectorAll(".clock-style-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.style === cfg.clockStyle);
+    });
+    document.querySelectorAll(".anchor-btn").forEach(btn => {
+      btn.classList.toggle("active", !cfg.clockDocked && btn.dataset.pos === cfg.clockAnchor);
+    });
 
     accentRgb = hexToRgb(cfg.accentColor);
     const { r, g, b } = accentRgb;
@@ -1431,6 +1995,10 @@ HTML_APP = r"""<!DOCTYPE html>
     root.setProperty("--bg-glow-2", `rgba(${r}, ${g}, ${b}, ${Math.min(0.35, 0.14 * inten)})`);
     root.setProperty("--cue-color", cfg.notationColor);
     root.setProperty("--cue-glow", `rgba(${cueRgb.r}, ${cueRgb.g}, ${cueRgb.b}, 0.9)`);
+    root.setProperty("--clock-color", cfg.clockColor);
+    root.setProperty("--clock-bg-alpha", cfg.clockOpacity);
+    root.setProperty("--clock-scale", cfg.clockScale);
+    root.setProperty("--clock-font", cfg.clockFont);
     document.getElementById("customColorPicker").value = cfg.accentColor;
 
     document.querySelectorAll(".scene-card").forEach(btn => {
@@ -1441,6 +2009,8 @@ HTML_APP = r"""<!DOCTYPE html>
     });
 
     updateSliderLabels();
+    positionClockFromRatios();
+    updateRealLifeClock();
 
     document.getElementById("sensorLeftLabel").textContent = prettyKey(cfg.leftKey);
     document.getElementById("sensorRightLabel").textContent = prettyKey(cfg.rightKey);
@@ -1480,6 +2050,7 @@ HTML_APP = r"""<!DOCTYPE html>
     phase = "RUNNING";
     runStart = performance.now();
     document.body.classList.add("running");
+    setEditMode(false);
     closeAllDrawers();
     postActionsEl.classList.remove("visible");
     fillEl.style.width = "0%";
@@ -1512,8 +2083,14 @@ HTML_APP = r"""<!DOCTYPE html>
     newScramble();
   }
 
+  let lastClockSec = -1;
   function tick(now) {
     drawBackgroundScene(now);
+    const secNow = Math.floor(now / 250);
+    if (secNow !== lastClockSec) {
+      lastClockSec = secNow;
+      updateRealLifeClock();
+    }
     if (phase === "HOLDING") {
       const pct = Math.min(100, ((now - holdStart) / cfg.holdMs) * 100);
       fillEl.style.width = pct + "%";
@@ -2042,7 +2619,7 @@ HTML_APP = r"""<!DOCTYPE html>
 
   // Right-Side Drawer Navigation (Themes, Config, History)
   const drawers = document.querySelectorAll(".side-drawer");
-  const navBtns = document.querySelectorAll(".emoji-nav-btn");
+  const navBtns = document.querySelectorAll(".emoji-nav-btn[data-drawer]");
 
   function closeAllDrawers() {
     bindingTarget = null;
@@ -2067,6 +2644,11 @@ HTML_APP = r"""<!DOCTYPE html>
   document.querySelectorAll(".close-drawer-btn").forEach(btn => {
     btn.addEventListener("click", closeAllDrawers);
   });
+
+  // Edit Mode Wiring
+  document.getElementById("editModeNavBtn").addEventListener("click", () => setEditMode(!editMode));
+  document.getElementById("toggleEditFromConfigBtn").addEventListener("click", () => setEditMode(!editMode));
+  document.getElementById("exitEditModeBtn").addEventListener("click", () => setEditMode(false));
 
   // UI Wiring
   document.querySelectorAll("button").forEach(btn => btn.addEventListener("focus", () => btn.blur()));
@@ -2108,6 +2690,78 @@ HTML_APP = r"""<!DOCTYPE html>
     saveCfg();
   });
 
+  // Clock Customization Controls
+  document.getElementById("clockEnabledChk").addEventListener("change", e => {
+    cfg.clockEnabled = e.target.checked;
+    saveCfg();
+  });
+
+  document.querySelectorAll(".clock-style-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      cfg.clockStyle = btn.dataset.style;
+      saveCfg();
+    });
+  });
+
+  document.getElementById("dockClockBtn").addEventListener("click", () => {
+    cfg.clockDocked = !cfg.clockDocked;
+    saveCfg();
+  });
+
+  document.querySelectorAll(".anchor-btn").forEach(btn => {
+    btn.addEventListener("click", () => snapClockToAnchor(btn.dataset.pos));
+  });
+
+  document.getElementById("clockTzSelect").addEventListener("change", e => {
+    cfg.clockTz = e.target.value;
+    saveCfg();
+  });
+
+  document.getElementById("clockFontSelect").addEventListener("change", e => {
+    cfg.clockFont = e.target.value;
+    saveCfg();
+  });
+
+  document.getElementById("clock24hChk").addEventListener("change", e => {
+    cfg.clock24h = e.target.checked;
+    saveCfg();
+  });
+
+  document.getElementById("clockSecChk").addEventListener("change", e => {
+    cfg.clockSeconds = e.target.checked;
+    saveCfg();
+  });
+
+  document.getElementById("clockDateChk").addEventListener("change", e => {
+    cfg.clockDate = e.target.checked;
+    saveCfg();
+  });
+
+  document.getElementById("clockBorderChk").addEventListener("change", e => {
+    cfg.clockBorder = e.target.checked;
+    saveCfg();
+  });
+
+  document.getElementById("clockHideRunChk").addEventListener("change", e => {
+    cfg.clockHideRunning = e.target.checked;
+    saveCfg();
+  });
+
+  document.getElementById("clockColorPicker").addEventListener("input", e => {
+    cfg.clockColor = e.target.value;
+    saveCfg();
+  });
+
+  document.getElementById("clockScaleSlider").addEventListener("input", e => {
+    cfg.clockScale = parseFloat(e.target.value);
+    saveCfg();
+  });
+
+  document.getElementById("clockOpacitySlider").addEventListener("input", e => {
+    cfg.clockOpacity = parseFloat(e.target.value);
+    saveCfg();
+  });
+
   // History Controls
   document.getElementById("filterStarBtn").addEventListener("click", e => {
     starOnly = !starOnly;
@@ -2129,6 +2783,11 @@ HTML_APP = r"""<!DOCTYPE html>
   document.getElementById("btnDeleteLast").addEventListener("click", () => lastRunId && window._ccAct(lastRunId, "del"));
 
   // Config Controls
+  document.getElementById("toggleFloatingPanelChk").addEventListener("change", e => {
+    cfg.floatingPanel = e.target.checked;
+    saveCfg();
+  });
+
   document.getElementById("toggleLabelsChk").addEventListener("change", e => {
     cfg.showLabels = e.target.checked;
     saveCfg();
@@ -2163,18 +2822,9 @@ HTML_APP = r"""<!DOCTYPE html>
   });
 
   document.getElementById("resetKeysBtn").addEventListener("click", () => {
-    cfg.leftKey = "AltLeft";
-    cfg.rightKey = "AltRight";
-    cfg.holdMs = 450;
-    cfg.showLabels = false;
-    cfg.showNotation = true;
-    cfg.notationColor = "#ef4444";
-    cfg.scene = "clouds";
-    cfg.accentColor = "#38bdf8";
-    cfg.sceneSize = 1.0;
-    cfg.sceneSpeed = 1.0;
-    cfg.sceneIntensity = 1.0;
+    cfg = { ...DEFAULT_CFG };
     bindingTarget = null;
+    setEditMode(false);
     saveCfg();
   });
 
