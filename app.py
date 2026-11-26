@@ -681,6 +681,7 @@ HTML_APP = r"""<!DOCTYPE html>
 
   /* 27-Cubie Real 3D Rubik's Cube */
   .cube-stage {
+    position: relative;
     width: 100%;
     height: 260px;
     display: flex;
@@ -694,6 +695,40 @@ HTML_APP = r"""<!DOCTYPE html>
     overflow: hidden;
   }
   .cube-stage:active { cursor: grabbing; }
+
+  /* Red Pre-Move Notation Cue Overlay in Front of Cube */
+  .move-cue-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    transform: scale(0.76);
+    transition: opacity 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .move-cue-overlay.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .move-cue-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 4.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #ef4444;
+    padding: 4px 26px;
+    border-radius: 18px;
+    background: rgba(10, 12, 18, 0.68);
+    border: 2px solid rgba(239, 68, 68, 0.55);
+    backdrop-filter: blur(4px);
+    text-shadow:
+      0 0 24px rgba(239, 68, 68, 0.9),
+      0 4px 18px rgba(0, 0, 0, 0.85);
+    box-shadow: 0 12px 36px rgba(239, 68, 68, 0.28);
+  }
 
   .cube-world {
     width: 0;
@@ -960,6 +995,9 @@ HTML_APP = r"""<!DOCTYPE html>
     </div>
     <div class="cube-stage" id="cubeStage">
       <div class="cube-world" id="cubeWorld"></div>
+      <div class="move-cue-overlay" id="moveCueOverlay">
+        <div class="move-cue-badge" id="moveCueBadge">R'</div>
+      </div>
     </div>
     <div class="move-desc" id="moveDesc">Solved — Press Play or Step Forward</div>
     <div class="move-pills" id="movePills"></div>
@@ -971,9 +1009,9 @@ HTML_APP = r"""<!DOCTYPE html>
         <button class="pill-btn" id="visNextBtn">▶|</button>
       </div>
       <div style="display:flex;gap:4px;">
-        <button class="pill-btn speed-btn" data-turn="750" data-pause="1400">0.5x</button>
-        <button class="pill-btn speed-btn active" data-turn="480" data-pause="950">1x</button>
-        <button class="pill-btn speed-btn" data-turn="260" data-pause="520">1.5x</button>
+        <button class="pill-btn speed-btn" data-cue="760" data-turn="750" data-pause="950">0.5x</button>
+        <button class="pill-btn speed-btn active" data-cue="540" data-turn="480" data-pause="650">1x</button>
+        <button class="pill-btn speed-btn" data-cue="340" data-turn="260" data-pause="360">1.5x</button>
       </div>
     </div>
   </div>
@@ -981,8 +1019,8 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v9_solves";
-  const STORAGE_CFG = "cc_v9_cfg";
+  const STORAGE_SOLVES = "cc_v10_solves";
+  const STORAGE_CFG = "cc_v10_cfg";
 
   let cfg = {
     leftKey: "AltLeft",
@@ -1649,7 +1687,7 @@ HTML_APP = r"""<!DOCTYPE html>
     saveSolves();
   };
 
-  // True 27-Cubie 3D Rubik's Cube Engine with Layer Turn Animations
+  // True 27-Cubie 3D Rubik's Cube Engine with Pre-Move Red Notation Cue
   const FACE_HEX = {
     U: "#f8fafc",
     D: "#facc15",
@@ -1682,14 +1720,18 @@ HTML_APP = r"""<!DOCTYPE html>
 
   const cubeWorld = document.getElementById("cubeWorld");
   const moveDescEl = document.getElementById("moveDesc");
+  const moveCueOverlay = document.getElementById("moveCueOverlay");
+  const moveCueBadge = document.getElementById("moveCueBadge");
   const SPACING = 47;
   let cubies = [];
   let visMoves = [];
   let visStep = 0;
   let isAnimating = false;
   let autoTimer = null;
+  let cueTimer = null;
+  let cueMs = 540;
   let turnMs = 480;
-  let pauseMs = 950;
+  let pauseMs = 650;
   let rotX = -26;
   let rotY = -36;
 
@@ -1811,35 +1853,54 @@ HTML_APP = r"""<!DOCTYPE html>
     }
   }
 
-  function animateSingleMove(mv, onDone) {
+  function clearMoveCue() {
+    if (cueTimer) {
+      clearTimeout(cueTimer);
+      cueTimer = null;
+    }
+    moveCueOverlay.classList.remove("visible");
+  }
+
+  // Shows the red move notation in front of the cube, fades it out, then rotates the layer
+  function executeMoveWithNotationCue(mv, stepNumber, onDone) {
     if (isAnimating) return;
     isAnimating = true;
-    const spec = parseMoveSpec(mv);
-    const layer = cubies.filter(spec.filter);
 
-    const pivot = document.createElement("div");
-    pivot.style.position = "absolute";
-    pivot.style.transformStyle = "preserve-3d";
-    pivot.style.transition = `transform ${turnMs}ms cubic-bezier(0.25, 0.85, 0.35, 1)`;
-    pivot.style.transform = "rotate3d(0,0,0,0deg)";
-    cubeWorld.appendChild(pivot);
-    layer.forEach(c => pivot.appendChild(c.el));
+    moveDescEl.textContent = `Step ${stepNumber}/${visMoves.length}: ${mv} — ${MOVE_TEXT[mv] || ""}`;
+    moveCueBadge.textContent = mv;
+    moveCueOverlay.classList.add("visible");
 
-    requestAnimationFrame(() => {
+    cueTimer = setTimeout(() => {
+      cueTimer = null;
+      moveCueOverlay.classList.remove("visible");
+
+      const spec = parseMoveSpec(mv);
+      const layer = cubies.filter(spec.filter);
+
+      const pivot = document.createElement("div");
+      pivot.style.position = "absolute";
+      pivot.style.transformStyle = "preserve-3d";
+      pivot.style.transition = `transform ${turnMs}ms cubic-bezier(0.25, 0.85, 0.35, 1)`;
+      pivot.style.transform = "rotate3d(0,0,0,0deg)";
+      cubeWorld.appendChild(pivot);
+      layer.forEach(c => pivot.appendChild(c.el));
+
       requestAnimationFrame(() => {
-        if (spec.axis === "x") pivot.style.transform = `rotateX(${spec.deg}deg)`;
-        else if (spec.axis === "y") pivot.style.transform = `rotateY(${spec.deg}deg)`;
-        else pivot.style.transform = `rotateZ(${spec.deg}deg)`;
+        requestAnimationFrame(() => {
+          if (spec.axis === "x") pivot.style.transform = `rotateX(${spec.deg}deg)`;
+          else if (spec.axis === "y") pivot.style.transform = `rotateY(${spec.deg}deg)`;
+          else pivot.style.transform = `rotateZ(${spec.deg}deg)`;
+        });
       });
-    });
 
-    setTimeout(() => {
-      layer.forEach(c => cubeWorld.appendChild(c.el));
-      pivot.remove();
-      commitMoveInstant(mv);
-      isAnimating = false;
-      if (onDone) onDone();
-    }, turnMs + 25);
+      setTimeout(() => {
+        layer.forEach(c => cubeWorld.appendChild(c.el));
+        pivot.remove();
+        commitMoveInstant(mv);
+        isAnimating = false;
+        if (onDone) onDone();
+      }, turnMs + 25);
+    }, cueMs);
   }
 
   function stopAutoPlay() {
@@ -1847,6 +1908,7 @@ HTML_APP = r"""<!DOCTYPE html>
       clearTimeout(autoTimer);
       autoTimer = null;
     }
+    clearMoveCue();
     document.getElementById("visPlayBtn").textContent = "▶ Play";
   }
 
@@ -1867,7 +1929,7 @@ HTML_APP = r"""<!DOCTYPE html>
     const mv = visMoves[visStep];
     visStep++;
     syncMovePills();
-    animateSingleMove(mv, () => {
+    executeMoveWithNotationCue(mv, visStep, () => {
       if (!autoTimer) return;
       autoTimer = setTimeout(scheduleNextAuto, pauseMs);
     });
@@ -1919,7 +1981,7 @@ HTML_APP = r"""<!DOCTYPE html>
     const mv = visMoves[visStep];
     visStep++;
     syncMovePills();
-    animateSingleMove(mv);
+    executeMoveWithNotationCue(mv, visStep);
   });
 
   document.getElementById("visPlayBtn").addEventListener("click", () => {
@@ -1935,6 +1997,7 @@ HTML_APP = r"""<!DOCTYPE html>
 
   document.querySelectorAll(".speed-btn").forEach(btn => {
     btn.addEventListener("click", () => {
+      cueMs = Number(btn.dataset.cue);
       turnMs = Number(btn.dataset.turn);
       pauseMs = Number(btn.dataset.pause);
       document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
