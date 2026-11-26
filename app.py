@@ -51,8 +51,8 @@ HTML_APP = r"""<!DOCTYPE html>
     --bg-glow-2: rgba(99, 102, 241, 0.12);
     --glass: rgba(15, 20, 32, 0.65);
     --glass-strong: rgba(12, 16, 26, 0.92);
-    --surface: rgba(255, 255, 255, 0.05);
-    --surface-hover: rgba(255, 255, 255, 0.1);
+    --surface: rgba(255, 255, 255, 0.055);
+    --surface-hover: rgba(255, 255, 255, 0.11);
     --border: rgba(255, 255, 255, 0.12);
     --text: #f8fafc;
     --muted: #94a3b8;
@@ -73,20 +73,47 @@ HTML_APP = r"""<!DOCTYPE html>
     --accent-glow: rgba(192, 132, 252, 0.4);
   }
 
+  body[data-theme="clouds"] {
+    --bg-core: #0f233c;
+    --bg-glow-1: rgba(125, 211, 252, 0.24);
+    --bg-glow-2: rgba(186, 230, 253, 0.16);
+    --glass: rgba(12, 28, 48, 0.58);
+    --accent: #7dd3fc;
+    --accent-glow: rgba(125, 211, 252, 0.38);
+  }
+
+  body[data-theme="forest"] {
+    --bg-core: #04110b;
+    --bg-glow-1: rgba(16, 185, 129, 0.22);
+    --bg-glow-2: rgba(52, 211, 153, 0.15);
+    --glass: rgba(6, 20, 14, 0.65);
+    --accent: #34d399;
+    --accent-glow: rgba(52, 211, 153, 0.38);
+  }
+
+  body[data-theme="rain"] {
+    --bg-core: #060b14;
+    --bg-glow-1: rgba(56, 189, 248, 0.18);
+    --bg-glow-2: rgba(100, 116, 139, 0.2);
+    --glass: rgba(9, 15, 26, 0.68);
+    --accent: #60a5fa;
+    --accent-glow: rgba(96, 165, 250, 0.38);
+  }
+
+  body[data-theme="snow"] {
+    --bg-core: #091322;
+    --bg-glow-1: rgba(224, 242, 254, 0.2);
+    --bg-glow-2: rgba(147, 197, 253, 0.18);
+    --accent: #bae6fd;
+    --accent-glow: rgba(186, 230, 253, 0.38);
+  }
+
   body[data-theme="inferno"] {
     --bg-core: #110403;
     --bg-glow-1: rgba(249, 115, 22, 0.26);
     --bg-glow-2: rgba(225, 29, 72, 0.22);
     --accent: #fb923c;
     --accent-glow: rgba(251, 146, 60, 0.4);
-  }
-
-  body[data-theme="arctic"] {
-    --bg-core: #041017;
-    --bg-glow-1: rgba(34, 211, 238, 0.22);
-    --bg-glow-2: rgba(56, 189, 248, 0.18);
-    --accent: #22d3ee;
-    --accent-glow: rgba(34, 211, 238, 0.38);
   }
 
   body[data-theme="cyber"] {
@@ -101,8 +128,8 @@ HTML_APP = r"""<!DOCTYPE html>
     --bg-core: #030e09;
     --bg-glow-1: rgba(16, 185, 129, 0.24);
     --bg-glow-2: rgba(5, 150, 105, 0.18);
-    --accent: #34d399;
-    --accent-glow: rgba(52, 211, 153, 0.38);
+    --accent: #10b981;
+    --accent-glow: rgba(16, 185, 129, 0.38);
   }
 
   body[data-theme="solar"] {
@@ -119,22 +146,6 @@ HTML_APP = r"""<!DOCTYPE html>
     --bg-glow-2: rgba(251, 113, 133, 0.2);
     --accent: #f9a8d4;
     --accent-glow: rgba(249, 168, 212, 0.38);
-  }
-
-  body[data-theme="void"] {
-    --bg-core: #070410;
-    --bg-glow-1: rgba(124, 58, 237, 0.26);
-    --bg-glow-2: rgba(79, 70, 229, 0.2);
-    --accent: #a78bfa;
-    --accent-glow: rgba(167, 139, 250, 0.4);
-  }
-
-  body[data-theme="crimson"] {
-    --bg-core: #120305;
-    --bg-glow-1: rgba(220, 38, 38, 0.26);
-    --bg-glow-2: rgba(153, 27, 27, 0.22);
-    --accent: #f87171;
-    --accent-glow: rgba(248, 113, 113, 0.4);
   }
 
   * {
@@ -257,7 +268,7 @@ HTML_APP = r"""<!DOCTYPE html>
   .nav-group {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
   }
 
   .pill-btn {
@@ -270,6 +281,9 @@ HTML_APP = r"""<!DOCTYPE html>
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   .pill-btn:hover {
     background: var(--surface-hover);
@@ -282,10 +296,33 @@ HTML_APP = r"""<!DOCTYPE html>
     box-shadow: 0 0 12px var(--accent-glow);
   }
 
-  .icon-btn {
-    font-size: 1rem;
-    padding: 5px 10px;
+  .emoji-nav-btn {
+    font-size: 1.05rem;
+    padding: 6px 11px;
     line-height: 1.1;
+    color: var(--text);
+    position: relative;
+  }
+  .nav-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
+    display: none;
+  }
+  body.show-nav-labels .nav-label {
+    display: inline;
+  }
+  .emoji-nav-btn:hover .nav-label {
+    color: var(--text);
+  }
+  .count-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--accent);
   }
 
   main {
@@ -319,7 +356,7 @@ HTML_APP = r"""<!DOCTYPE html>
     font-weight: 800;
     letter-spacing: -0.04em;
     line-height: 1;
-    text-shadow: 0 8px 36px rgba(0, 0, 0, 0.45);
+    text-shadow: 0 8px 36px rgba(0, 0, 0, 0.5);
     transition: color 0.12s ease, text-shadow 0.12s ease, transform 0.12s ease;
   }
   .timer-display.holding {
@@ -544,6 +581,13 @@ HTML_APP = r"""<!DOCTYPE html>
   }
 
   /* Theme Grid */
+  .theme-section-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-top: 2px;
+  }
   .theme-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -552,13 +596,13 @@ HTML_APP = r"""<!DOCTYPE html>
   .theme-card {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
+    gap: 9px;
+    padding: 9px 11px;
     border-radius: 10px;
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
-    font-size: 0.82rem;
+    font-size: 0.81rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -573,12 +617,52 @@ HTML_APP = r"""<!DOCTYPE html>
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 14px var(--accent-glow);
   }
-  .theme-swatch {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
+  .theme-icon {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
     flex-shrink: 0;
-    border: 1px solid rgba(255, 255, 255, 0.35);
+  }
+
+  /* Toggle Switch */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+  }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border);
+    transition: 0.2s;
+    border-radius: 999px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--text);
+    transition: 0.2s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: var(--accent);
+    border-color: var(--accent);
+  }
+  input:checked + .slider:before {
+    transform: translateX(18px);
+    background-color: #060911;
   }
 
   /* 27-Cubie Real 3D Rubik's Cube */
@@ -689,7 +773,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
 </style>
 </head>
-<body data-theme="galaxy">
+<body data-theme="clouds">
 
 <canvas id="bgCanvas"></canvas>
 <div class="ambient-orb orb-1"></div>
@@ -702,9 +786,15 @@ HTML_APP = r"""<!DOCTYPE html>
     <button class="pill-btn" id="newScrambleBtn" title="New Scramble">↻</button>
   </div>
   <div class="nav-group">
-    <button class="pill-btn icon-btn" id="themesBtn" title="Themes">🎨</button>
-    <button class="pill-btn" id="configBtn">⚙ Keys</button>
-    <button class="pill-btn" id="drawerBtn">Solves (<span id="solveCount">0</span>)</button>
+    <button class="pill-btn emoji-nav-btn" id="themesBtn" title="Themes">
+      <span>🎨</span><span class="nav-label">Themes</span>
+    </button>
+    <button class="pill-btn emoji-nav-btn" id="configBtn" title="Config">
+      <span>⚙️</span><span class="nav-label">Config</span>
+    </button>
+    <button class="pill-btn emoji-nav-btn" id="drawerBtn" title="History">
+      <span>📜</span><span class="nav-label">History</span><span class="count-badge" id="solveCount">0</span>
+    </button>
   </div>
 </header>
 
@@ -735,7 +825,7 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
-    <span>Session Solves</span>
+    <span>📜 History</span>
     <div style="display:flex;gap:6px;">
       <button class="pill-btn" id="filterStarBtn" style="padding:4px 8px;font-size:0.74rem;">★ Only</button>
       <button class="pill-btn" id="clearAllBtn" style="padding:4px 8px;font-size:0.74rem;">Clear All</button>
@@ -746,30 +836,44 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <!-- Themes Modal -->
 <div class="modal-backdrop" id="themesModal">
-  <div class="modal" style="width:410px;">
+  <div class="modal" style="width:430px;">
     <div style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-weight:600;font-size:0.95rem;">🎨 Select Theme</span>
+      <span style="font-weight:600;font-size:0.95rem;">🎨 Themes</span>
       <button class="pill-btn" id="closeThemesBtn" style="padding:4px 9px;">✕</button>
     </div>
-    <div class="theme-grid" id="themeGrid">
-      <button class="theme-card" data-theme="obsidian"><span class="theme-swatch" style="background:linear-gradient(135deg,#0f172a,#38bdf8);"></span>Obsidian</button>
-      <button class="theme-card" data-theme="galaxy"><span class="theme-swatch" style="background:linear-gradient(135deg,#3b0764,#c084fc);"></span>Galaxy</button>
-      <button class="theme-card" data-theme="inferno"><span class="theme-swatch" style="background:linear-gradient(135deg,#7c2d12,#fb923c);"></span>Inferno</button>
-      <button class="theme-card" data-theme="arctic"><span class="theme-swatch" style="background:linear-gradient(135deg,#083344,#22d3ee);"></span>Arctic</button>
-      <button class="theme-card" data-theme="cyber"><span class="theme-swatch" style="background:linear-gradient(135deg,#831843,#10b981);"></span>Cyberpunk</button>
-      <button class="theme-card" data-theme="emerald"><span class="theme-swatch" style="background:linear-gradient(135deg,#064e3b,#34d399);"></span>Emerald Matrix</button>
-      <button class="theme-card" data-theme="solar"><span class="theme-swatch" style="background:linear-gradient(135deg,#78350f,#fbbf24);"></span>Solar Gold</button>
-      <button class="theme-card" data-theme="sakura"><span class="theme-swatch" style="background:linear-gradient(135deg,#701a75,#f9a8d4);"></span>Sakura</button>
-      <button class="theme-card" data-theme="void"><span class="theme-swatch" style="background:linear-gradient(135deg,#2e1065,#8b5cf6);"></span>Void Purple</button>
-      <button class="theme-card" data-theme="crimson"><span class="theme-swatch" style="background:linear-gradient(135deg,#7f1d1d,#f87171);"></span>Crimson Blood</button>
+
+    <div class="theme-section-label">Animated Scenic Environments</div>
+    <div class="theme-grid">
+      <button class="theme-card" data-theme="clouds"><span class="theme-icon">☁️</span>Sky Clouds</button>
+      <button class="theme-card" data-theme="forest"><span class="theme-icon">🌲</span>Mist Forest</button>
+      <button class="theme-card" data-theme="rain"><span class="theme-icon">🌧️</span>Rainstorm</button>
+      <button class="theme-card" data-theme="snow"><span class="theme-icon">❄️</span>Snowfall</button>
+    </div>
+
+    <div class="theme-section-label">Atmospheric Palettes</div>
+    <div class="theme-grid">
+      <button class="theme-card" data-theme="galaxy"><span class="theme-icon">🌌</span>Galaxy</button>
+      <button class="theme-card" data-theme="inferno"><span class="theme-icon">🔥</span>Inferno</button>
+      <button class="theme-card" data-theme="cyber"><span class="theme-icon">💠</span>Cyberpunk</button>
+      <button class="theme-card" data-theme="emerald"><span class="theme-icon">🟢</span>Emerald Matrix</button>
+      <button class="theme-card" data-theme="solar"><span class="theme-icon">☀️</span>Solar Gold</button>
+      <button class="theme-card" data-theme="sakura"><span class="theme-icon">🌸</span>Sakura</button>
+      <button class="theme-card" data-theme="obsidian"><span class="theme-icon">🌑</span>Obsidian</button>
     </div>
   </div>
 </div>
 
-<!-- Key Configuration Modal -->
+<!-- Config Modal -->
 <div class="modal-backdrop" id="configModal">
-  <div class="modal" style="width:380px;">
-    <div style="font-weight:600;font-size:0.95rem;">Trigger Key Settings</div>
+  <div class="modal" style="width:400px;">
+    <div style="font-weight:600;font-size:0.95rem;">⚙️ Config</div>
+    <div class="modal-row">
+      <span>Show Button Text Labels ("Themes", "Config", "History")</span>
+      <label class="switch">
+        <input type="checkbox" id="toggleLabelsChk">
+        <span class="slider"></span>
+      </label>
+    </div>
     <div class="modal-row">
       <span>Left Key</span>
       <button class="pill-btn" id="bindLeftBtn">AltLeft</button>
@@ -823,10 +927,16 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v6_solves";
-  const STORAGE_CFG = "cc_v6_cfg";
+  const STORAGE_SOLVES = "cc_v7_solves";
+  const STORAGE_CFG = "cc_v7_cfg";
 
-  let cfg = { leftKey: "AltLeft", rightKey: "AltRight", holdMs: 450, theme: "galaxy" };
+  let cfg = {
+    leftKey: "AltLeft",
+    rightKey: "AltRight",
+    holdMs: 450,
+    theme: "clouds",
+    showLabels: false
+  };
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_CFG));
     if (saved) cfg = { ...cfg, ...saved };
@@ -838,50 +948,232 @@ HTML_APP = r"""<!DOCTYPE html>
     if (Array.isArray(saved)) solves = saved;
   } catch (e) {}
 
-  // Ambient Particle Canvas
+  // Procedural Scenic & Atmospheric Background Canvas
   const canvas = document.getElementById("bgCanvas");
   const ctx = canvas.getContext("2d");
+
   let particles = [];
+  let clouds = [];
+  let rainDrops = [];
+  let ripples = [];
+  let treesFar = [];
+  let treesNear = [];
+  let lightningAlpha = 0;
+
+  function initSceneEntities() {
+    const w = canvas.width;
+    const h = canvas.height;
+
+    particles = Array.from({ length: 55 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 2 + 0.7,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      phase: Math.random() * Math.PI * 2,
+      a: Math.random() * 0.5 + 0.15
+    }));
+
+    clouds = Array.from({ length: 9 }, (_, i) => ({
+      x: (i / 9) * (w + 400) - 200,
+      y: 55 + Math.random() * (h * 0.55),
+      scale: 0.7 + Math.random() * 0.85,
+      speed: 0.14 + Math.random() * 0.22,
+      alpha: 0.08 + Math.random() * 0.1
+    }));
+
+    rainDrops = Array.from({ length: 130 }, () => ({
+      x: Math.random() * (w + 200),
+      y: Math.random() * h,
+      len: 14 + Math.random() * 18,
+      speed: 9 + Math.random() * 7,
+      alpha: 0.14 + Math.random() * 0.24
+    }));
+
+    treesFar = [];
+    for (let x = -40; x < w + 80; x += 48 + Math.random() * 28) {
+      treesFar.push({
+        x,
+        height: 110 + Math.random() * 85,
+        width: 34 + Math.random() * 18
+      });
+    }
+
+    treesNear = [];
+    for (let x = -40; x < w + 80; x += 64 + Math.random() * 34) {
+      treesNear.push({
+        x,
+        height: 155 + Math.random() * 110,
+        width: 48 + Math.random() * 22
+      });
+    }
+  }
+
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    initSceneEntities();
   }
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  for (let i = 0; i < 48; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.8 + 0.6,
-      vx: (Math.random() - 0.5) * 0.28,
-      vy: (Math.random() - 0.5) * 0.28,
-      a: Math.random() * 0.45 + 0.1
-    });
+  function drawCloudShape(x, y, scale, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    ctx.fillStyle = `rgba(224, 242, 254, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, 42, 0, Math.PI * 2);
+    ctx.arc(38, -10, 50, 0, Math.PI * 2);
+    ctx.arc(84, -4, 44, 0, Math.PI * 2);
+    ctx.arc(118, 8, 32, 0, Math.PI * 2);
+    ctx.arc(-34, 10, 30, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
-  function drawParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function drawPineTree(x, baseY, width, height, color) {
+    ctx.fillStyle = color;
+    const tiers = 4;
+    for (let t = 0; t < tiers; t++) {
+      const ratio = t / tiers;
+      const tierTop = baseY - height + ratio * (height * 0.55);
+      const tierBottom = tierTop + height * 0.42;
+      const halfW = (width * 0.5) * (0.45 + ratio * 0.65);
+      ctx.beginPath();
+      ctx.moveTo(x, tierTop);
+      ctx.lineTo(x - halfW, tierBottom);
+      ctx.lineTo(x + halfW, tierBottom);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  function drawBackgroundScene(now) {
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    if (cfg.theme === "clouds") {
+      // Soft sky gradient + drifting multi-puff clouds
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, "rgba(14, 41, 74, 0.55)");
+      grad.addColorStop(1, "rgba(7, 17, 32, 0.2)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      for (const c of clouds) {
+        c.x += c.speed;
+        if (c.x > w + 220) c.x = -240;
+        drawCloudShape(c.x, c.y, c.scale, c.alpha);
+      }
+      return;
+    }
+
+    if (cfg.theme === "forest") {
+      // Layered pine forest silhouettes + drifting fireflies & ground mist
+      const mist = ctx.createLinearGradient(0, h - 220, 0, h);
+      mist.addColorStop(0, "rgba(16, 185, 129, 0)");
+      mist.addColorStop(1, "rgba(16, 185, 129, 0.14)");
+      ctx.fillStyle = mist;
+      ctx.fillRect(0, h - 220, w, 220);
+
+      for (const t of treesFar) {
+        drawPineTree(t.x, h, t.width, t.height, "rgba(6, 36, 24, 0.65)");
+      }
+      for (const t of treesNear) {
+        drawPineTree(t.x, h, t.width, t.height, "rgba(3, 22, 14, 0.92)");
+      }
+
+      for (const p of particles) {
+        p.x += p.vx + Math.sin(now * 0.001 + p.phase) * 0.18;
+        p.y += p.vy - 0.12;
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h - 40;
+        const glow = 0.25 + 0.45 * Math.abs(Math.sin(now * 0.002 + p.phase));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r + 0.6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(110, 231, 183, ${glow})`;
+        ctx.fill();
+      }
+      return;
+    }
+
+    if (cfg.theme === "rain") {
+      // Diagonal rain streaks + ground splash ripples + subtle distant lightning
+      if (Math.random() < 0.0025) lightningAlpha = 0.14;
+      if (lightningAlpha > 0.002) {
+        ctx.fillStyle = `rgba(186, 230, 253, ${lightningAlpha})`;
+        ctx.fillRect(0, 0, w, h);
+        lightningAlpha *= 0.88;
+      }
+
+      ctx.lineWidth = 1.1;
+      for (const d of rainDrops) {
+        d.x -= d.speed * 0.24;
+        d.y += d.speed;
+        if (d.y > h - 8) {
+          if (Math.random() < 0.25 && ripples.length < 35) {
+            ripples.push({ x: d.x, y: h - 6 - Math.random() * 14, r: 1, a: 0.35 });
+          }
+          d.y = -20;
+          d.x = Math.random() * (w + 200);
+        }
+        ctx.strokeStyle = `rgba(147, 197, 253, ${d.alpha})`;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x + d.len * 0.24, d.y - d.len);
+        ctx.stroke();
+      }
+
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const rp = ripples[i];
+        rp.r += 0.65;
+        rp.a *= 0.93;
+        ctx.strokeStyle = `rgba(186, 230, 253, ${rp.a})`;
+        ctx.beginPath();
+        ctx.ellipse(rp.x, rp.y, rp.r * 2.2, rp.r * 0.55, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        if (rp.a < 0.02) ripples.splice(i, 1);
+      }
+      return;
+    }
+
+    if (cfg.theme === "snow") {
+      for (const p of particles) {
+        p.y += 0.65 + p.r * 0.35;
+        p.x += Math.sin(now * 0.0012 + p.phase) * 0.45;
+        if (p.y > h) {
+          p.y = -10;
+          p.x = Math.random() * w;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r + 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(240, 249, 255, ${p.a + 0.2})`;
+        ctx.fill();
+      }
+      return;
+    }
+
+    // Standard ambient particles for Galaxy, Inferno, Cyber, Emerald, Solar, Sakura, Obsidian
     const colorMap = {
       obsidian: "148, 163, 184",
       galaxy: "192, 132, 252",
       inferno: "251, 146, 60",
-      arctic: "34, 211, 238",
       cyber: "244, 114, 182",
       emerald: "52, 211, 153",
       solar: "251, 191, 36",
-      sakura: "249, 168, 212",
-      void: "167, 139, 250",
-      crimson: "248, 113, 113"
+      sakura: "249, 168, 212"
     };
     const rgb = colorMap[cfg.theme] || colorMap.galaxy;
     for (const p of particles) {
       p.x += p.vx;
       p.y += p.vy;
-      if (p.x < 0) p.x = canvas.width;
-      if (p.x > canvas.width) p.x = 0;
-      if (p.y < 0) p.y = canvas.height;
-      if (p.y > canvas.height) p.y = 0;
+      if (p.x < 0) p.x = w;
+      if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h;
+      if (p.y > h) p.y = 0;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${rgb}, ${p.a})`;
@@ -955,6 +1247,9 @@ HTML_APP = r"""<!DOCTYPE html>
 
   function syncLabels() {
     document.body.dataset.theme = cfg.theme;
+    document.body.classList.toggle("show-nav-labels", Boolean(cfg.showLabels));
+    document.getElementById("toggleLabelsChk").checked = Boolean(cfg.showLabels);
+
     document.querySelectorAll(".theme-card").forEach(b => {
       b.classList.toggle("active", b.dataset.theme === cfg.theme);
     });
@@ -1028,7 +1323,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
 
   function tick(now) {
-    drawParticles();
+    drawBackgroundScene(now);
     if (phase === "HOLDING") {
       const pct = Math.min(100, ((now - holdStart) / cfg.holdMs) * 100);
       fillEl.style.width = pct + "%";
@@ -1076,7 +1371,6 @@ HTML_APP = r"""<!DOCTYPE html>
 
     if (blockUntilRelease) return;
 
-    // Update leftDown / rightDown consistently in both IDLE and RUNNING states
     if (
       e.code === "ControlLeft" &&
       cfg.leftKey !== "ControlLeft" &&
@@ -1570,12 +1864,18 @@ HTML_APP = r"""<!DOCTYPE html>
   document.getElementById("btnStar").addEventListener("click", () => lastRunId && window._ccAct(lastRunId, "star"));
   document.getElementById("btnDeleteLast").addEventListener("click", () => lastRunId && window._ccAct(lastRunId, "del"));
 
+  // Config Modal & Label Toggle
   const modal = document.getElementById("configModal");
   document.getElementById("configBtn").addEventListener("click", () => modal.classList.add("open"));
   document.getElementById("closeConfigBtn").addEventListener("click", () => {
     bindingTarget = null;
     modal.classList.remove("open");
     syncLabels();
+  });
+
+  document.getElementById("toggleLabelsChk").addEventListener("change", e => {
+    cfg.showLabels = e.target.checked;
+    saveCfg();
   });
 
   document.getElementById("bindLeftBtn").addEventListener("click", e => {
@@ -1599,6 +1899,7 @@ HTML_APP = r"""<!DOCTYPE html>
     cfg.leftKey = "AltLeft";
     cfg.rightKey = "AltRight";
     cfg.holdMs = 450;
+    cfg.showLabels = false;
     bindingTarget = null;
     saveCfg();
   });
