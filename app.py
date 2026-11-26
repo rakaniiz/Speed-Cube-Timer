@@ -696,7 +696,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
   .cube-stage:active { cursor: grabbing; }
 
-  /* Red Pre-Move Notation Cue Overlay in Front of Cube */
+  /* Cube-sized Red Notation Cue placed in front of the 3D Z-plane */
   .move-cue-overlay {
     position: absolute;
     inset: 0;
@@ -704,30 +704,34 @@ HTML_APP = r"""<!DOCTYPE html>
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    z-index: 20;
+    z-index: 50;
     opacity: 0;
-    transform: scale(0.76);
-    transition: opacity 0.24s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateZ(260px) scale(0.82);
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .move-cue-overlay.visible {
     opacity: 1;
-    transform: scale(1);
+    transform: translateZ(260px) scale(1);
   }
   .move-cue-badge {
+    width: 176px;
+    height: 176px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 4.4rem;
+    font-size: 7.4rem;
     font-weight: 800;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.05em;
+    line-height: 1;
     color: #ef4444;
-    padding: 4px 26px;
-    border-radius: 18px;
-    background: rgba(10, 12, 18, 0.68);
-    border: 2px solid rgba(239, 68, 68, 0.55);
-    backdrop-filter: blur(4px);
+    border-radius: 24px;
+    background: rgba(8, 10, 16, 0.58);
+    border: 2px solid rgba(239, 68, 68, 0.45);
     text-shadow:
-      0 0 24px rgba(239, 68, 68, 0.9),
-      0 4px 18px rgba(0, 0, 0, 0.85);
-    box-shadow: 0 12px 36px rgba(239, 68, 68, 0.28);
+      0 0 28px rgba(239, 68, 68, 0.95),
+      0 6px 24px rgba(0, 0, 0, 0.95);
+    box-shadow: 0 0 42px rgba(239, 68, 68, 0.28);
   }
 
   .cube-world {
@@ -1019,8 +1023,8 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v10_solves";
-  const STORAGE_CFG = "cc_v10_cfg";
+  const STORAGE_SOLVES = "cc_v11_solves";
+  const STORAGE_CFG = "cc_v11_cfg";
 
   let cfg = {
     leftKey: "AltLeft",
@@ -1729,7 +1733,7 @@ HTML_APP = r"""<!DOCTYPE html>
   let isAnimating = false;
   let autoTimer = null;
   let cueTimer = null;
-  let cueMs = 540;
+  let cueMs = 580;
   let turnMs = 480;
   let pauseMs = 650;
   let rotX = -26;
@@ -1861,7 +1865,7 @@ HTML_APP = r"""<!DOCTYPE html>
     moveCueOverlay.classList.remove("visible");
   }
 
-  // Shows the red move notation in front of the cube, fades it out, then rotates the layer
+  // Shows the red move notation on top of the cube, fades it out, then rotates the layer
   function executeMoveWithNotationCue(mv, stepNumber, onDone) {
     if (isAnimating) return;
     isAnimating = true;
