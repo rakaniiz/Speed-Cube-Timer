@@ -47,17 +47,18 @@ HTML_APP = r"""<!DOCTYPE html>
 <style>
   :root {
     --bg-core: #07090f;
-    --bg-glow-1: rgba(56, 189, 248, 0.14);
-    --bg-glow-2: rgba(99, 102, 241, 0.12);
+    --bg-glow-1: rgba(56, 189, 248, 0.22);
+    --bg-glow-2: rgba(56, 189, 248, 0.14);
     --glass: rgba(15, 20, 32, 0.65);
-    --glass-strong: rgba(12, 16, 26, 0.92);
+    --glass-strong: rgba(12, 16, 26, 0.94);
     --surface: rgba(255, 255, 255, 0.055);
     --surface-hover: rgba(255, 255, 255, 0.11);
     --border: rgba(255, 255, 255, 0.12);
     --text: #f8fafc;
     --muted: #94a3b8;
     --accent: #38bdf8;
-    --accent-glow: rgba(56, 189, 248, 0.35);
+    --accent-rgb: 56, 189, 248;
+    --accent-glow: rgba(56, 189, 248, 0.36);
     --amber: #f59e0b;
     --amber-glow: rgba(245, 158, 11, 0.35);
     --green: #10b981;
@@ -65,88 +66,12 @@ HTML_APP = r"""<!DOCTYPE html>
     --red: #ef4444;
   }
 
-  body[data-theme="galaxy"] {
-    --bg-core: #060412;
-    --bg-glow-1: rgba(168, 85, 247, 0.25);
-    --bg-glow-2: rgba(59, 130, 246, 0.22);
-    --accent: #c084fc;
-    --accent-glow: rgba(192, 132, 252, 0.4);
-  }
-
-  body[data-theme="clouds"] {
-    --bg-core: #0f233c;
-    --bg-glow-1: rgba(125, 211, 252, 0.24);
-    --bg-glow-2: rgba(186, 230, 253, 0.16);
-    --glass: rgba(12, 28, 48, 0.58);
-    --accent: #7dd3fc;
-    --accent-glow: rgba(125, 211, 252, 0.38);
-  }
-
-  body[data-theme="forest"] {
-    --bg-core: #04110b;
-    --bg-glow-1: rgba(16, 185, 129, 0.22);
-    --bg-glow-2: rgba(52, 211, 153, 0.15);
-    --glass: rgba(6, 20, 14, 0.65);
-    --accent: #34d399;
-    --accent-glow: rgba(52, 211, 153, 0.38);
-  }
-
-  body[data-theme="rain"] {
-    --bg-core: #060b14;
-    --bg-glow-1: rgba(56, 189, 248, 0.18);
-    --bg-glow-2: rgba(100, 116, 139, 0.2);
-    --glass: rgba(9, 15, 26, 0.68);
-    --accent: #60a5fa;
-    --accent-glow: rgba(96, 165, 250, 0.38);
-  }
-
-  body[data-theme="snow"] {
-    --bg-core: #091322;
-    --bg-glow-1: rgba(224, 242, 254, 0.2);
-    --bg-glow-2: rgba(147, 197, 253, 0.18);
-    --accent: #bae6fd;
-    --accent-glow: rgba(186, 230, 253, 0.38);
-  }
-
-  body[data-theme="inferno"] {
-    --bg-core: #110403;
-    --bg-glow-1: rgba(249, 115, 22, 0.26);
-    --bg-glow-2: rgba(225, 29, 72, 0.22);
-    --accent: #fb923c;
-    --accent-glow: rgba(251, 146, 60, 0.4);
-  }
-
-  body[data-theme="cyber"] {
-    --bg-core: #050811;
-    --bg-glow-1: rgba(236, 72, 153, 0.24);
-    --bg-glow-2: rgba(16, 185, 129, 0.18);
-    --accent: #f472b6;
-    --accent-glow: rgba(244, 114, 182, 0.4);
-  }
-
-  body[data-theme="emerald"] {
-    --bg-core: #030e09;
-    --bg-glow-1: rgba(16, 185, 129, 0.24);
-    --bg-glow-2: rgba(5, 150, 105, 0.18);
-    --accent: #10b981;
-    --accent-glow: rgba(16, 185, 129, 0.38);
-  }
-
-  body[data-theme="solar"] {
-    --bg-core: #100b03;
-    --bg-glow-1: rgba(245, 158, 11, 0.24);
-    --bg-glow-2: rgba(234, 179, 8, 0.18);
-    --accent: #fbbf24;
-    --accent-glow: rgba(251, 191, 36, 0.38);
-  }
-
-  body[data-theme="sakura"] {
-    --bg-core: #12060c;
-    --bg-glow-1: rgba(244, 114, 182, 0.24);
-    --bg-glow-2: rgba(251, 113, 133, 0.2);
-    --accent: #f9a8d4;
-    --accent-glow: rgba(249, 168, 212, 0.38);
-  }
+  body[data-scene="clouds"] { --bg-core: #0d1f36; }
+  body[data-scene="forest"] { --bg-core: #04100a; }
+  body[data-scene="rain"]   { --bg-core: #060b14; }
+  body[data-scene="snow"]   { --bg-core: #081220; }
+  body[data-scene="galaxy"] { --bg-core: #060412; }
+  body[data-scene="minimal"]{ --bg-core: #07090f; }
 
   * {
     box-sizing: border-box;
@@ -210,13 +135,13 @@ HTML_APP = r"""<!DOCTYPE html>
 
   header {
     position: relative;
-    z-index: 15;
+    z-index: 30;
     width: 100%;
+    height: 58px;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 20px;
+    padding: 0 20px;
     background: var(--glass);
     backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--border);
@@ -301,7 +226,6 @@ HTML_APP = r"""<!DOCTYPE html>
     padding: 6px 11px;
     line-height: 1.1;
     color: var(--text);
-    position: relative;
   }
   .nav-label {
     font-size: 0.8rem;
@@ -312,7 +236,8 @@ HTML_APP = r"""<!DOCTYPE html>
   body.show-nav-labels .nav-label {
     display: inline;
   }
-  .emoji-nav-btn:hover .nav-label {
+  .emoji-nav-btn:hover .nav-label,
+  .emoji-nav-btn.active .nav-label {
     color: var(--text);
   }
   .count-badge {
@@ -482,13 +407,14 @@ HTML_APP = r"""<!DOCTYPE html>
     font-weight: 700;
   }
 
-  .drawer {
+  /* Unified Right-Side Slide-Out Drawers (Themes, Config, History) */
+  .side-drawer {
     position: fixed;
     top: 58px;
     right: 0;
     bottom: 0;
-    width: 330px;
-    max-width: 90vw;
+    width: 345px;
+    max-width: 92vw;
     background: var(--glass-strong);
     backdrop-filter: blur(22px);
     border-left: 1px solid var(--border);
@@ -498,7 +424,7 @@ HTML_APP = r"""<!DOCTYPE html>
     flex-direction: column;
     z-index: 25;
   }
-  .drawer.open { transform: translateX(0); }
+  .side-drawer.open { transform: translateX(0); }
 
   .drawer-head {
     padding: 14px 16px;
@@ -506,14 +432,164 @@ HTML_APP = r"""<!DOCTYPE html>
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.86rem;
+    font-size: 0.88rem;
     font-weight: 600;
   }
 
-  .solve-list {
+  .drawer-body {
     flex: 1;
     overflow-y: auto;
-    padding: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .scene-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .scene-card {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 11px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.81rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+  }
+  .scene-card:hover {
+    background: var(--surface-hover);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .scene-card.active {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 14px var(--accent-glow);
+  }
+
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .color-swatch-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 6px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .color-swatch-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+  .color-swatch-btn.active {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+  .swatch-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+  }
+
+  .custom-color-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 11px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 0.81rem;
+    color: var(--muted);
+  }
+  input[type="color"] {
+    width: 34px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .config-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--muted);
+    gap: 10px;
+  }
+
+  /* Toggle Switch */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border);
+    transition: 0.2s;
+    border-radius: 999px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--text);
+    transition: 0.2s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: var(--accent);
+    border-color: var(--accent);
+  }
+  input:checked + .slider:before {
+    transform: translateX(18px);
+    background-color: #060911;
+  }
+
+  .solve-list {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -547,6 +623,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
   .mini-btn:hover { color: var(--text); border-color: var(--accent); }
 
+  /* 3D Scramble Modal */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -560,7 +637,7 @@ HTML_APP = r"""<!DOCTYPE html>
   .modal-backdrop.open { display: flex; }
 
   .modal {
-    width: 440px;
+    width: 500px;
     max-width: 94vw;
     background: #0f1422;
     border: 1px solid var(--border);
@@ -570,99 +647,6 @@ HTML_APP = r"""<!DOCTYPE html>
     flex-direction: column;
     gap: 13px;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
-  }
-
-  .modal-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-
-  /* Theme Grid */
-  .theme-section-label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-  .theme-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-  .theme-card {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 9px 11px;
-    border-radius: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 0.81rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    text-align: left;
-  }
-  .theme-card:hover {
-    background: var(--surface-hover);
-    border-color: rgba(255, 255, 255, 0.25);
-  }
-  .theme-card.active {
-    border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 14px var(--accent-glow);
-  }
-  .theme-icon {
-    font-size: 1rem;
-    width: 20px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  /* Toggle Switch */
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 22px;
-  }
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    inset: 0;
-    background-color: rgba(255, 255, 255, 0.12);
-    border: 1px solid var(--border);
-    transition: 0.2s;
-    border-radius: 999px;
-  }
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: var(--text);
-    transition: 0.2s;
-    border-radius: 50%;
-  }
-  input:checked + .slider {
-    background-color: var(--accent);
-    border-color: var(--accent);
-  }
-  input:checked + .slider:before {
-    transform: translateX(18px);
-    background-color: #060911;
   }
 
   /* 27-Cubie Real 3D Rubik's Cube */
@@ -773,7 +757,7 @@ HTML_APP = r"""<!DOCTYPE html>
   }
 </style>
 </head>
-<body data-theme="clouds">
+<body data-scene="clouds">
 
 <canvas id="bgCanvas"></canvas>
 <div class="ambient-orb orb-1"></div>
@@ -786,13 +770,13 @@ HTML_APP = r"""<!DOCTYPE html>
     <button class="pill-btn" id="newScrambleBtn" title="New Scramble">↻</button>
   </div>
   <div class="nav-group">
-    <button class="pill-btn emoji-nav-btn" id="themesBtn" title="Themes">
+    <button class="pill-btn emoji-nav-btn" id="themesNavBtn" data-drawer="themesDrawer" title="Themes">
       <span>🎨</span><span class="nav-label">Themes</span>
     </button>
-    <button class="pill-btn emoji-nav-btn" id="configBtn" title="Config">
+    <button class="pill-btn emoji-nav-btn" id="configNavBtn" data-drawer="configDrawer" title="Config">
       <span>⚙️</span><span class="nav-label">Config</span>
     </button>
-    <button class="pill-btn emoji-nav-btn" id="drawerBtn" title="History">
+    <button class="pill-btn emoji-nav-btn" id="historyNavBtn" data-drawer="historyDrawer" title="History">
       <span>📜</span><span class="nav-label">History</span><span class="count-badge" id="solveCount">0</span>
     </button>
   </div>
@@ -823,83 +807,98 @@ HTML_APP = r"""<!DOCTYPE html>
   </div>
 </main>
 
-<aside class="drawer" id="drawer">
+<!-- 1. Themes Side Drawer -->
+<aside class="side-drawer" id="themesDrawer">
   <div class="drawer-head">
-    <span>📜 History</span>
-    <div style="display:flex;gap:6px;">
-      <button class="pill-btn" id="filterStarBtn" style="padding:4px 8px;font-size:0.74rem;">★ Only</button>
-      <button class="pill-btn" id="clearAllBtn" style="padding:4px 8px;font-size:0.74rem;">Clear All</button>
+    <span>🎨 Themes</span>
+    <button class="pill-btn close-drawer-btn" style="padding:3px 8px;">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="section-label">Animated Scenes</div>
+    <div class="scene-grid">
+      <button class="scene-card" data-scene="clouds"><span>☁️</span>Sky Clouds</button>
+      <button class="scene-card" data-scene="forest"><span>🌲</span>Mist Forest</button>
+      <button class="scene-card" data-scene="rain"><span>🌧️</span>Rainstorm</button>
+      <button class="scene-card" data-scene="snow"><span>❄️</span>Snowfall</button>
+      <button class="scene-card" data-scene="galaxy"><span>🌌</span>Galaxy</button>
+      <button class="scene-card" data-scene="minimal"><span>🌑</span>Minimal</button>
+    </div>
+
+    <div class="section-label">Scene & Accent Color</div>
+    <div class="color-grid">
+      <button class="color-swatch-btn" data-color="#38bdf8"><span class="swatch-dot" style="background:#38bdf8;"></span>Sky</button>
+      <button class="color-swatch-btn" data-color="#c084fc"><span class="swatch-dot" style="background:#c084fc;"></span>Violet</button>
+      <button class="color-swatch-btn" data-color="#fb923c"><span class="swatch-dot" style="background:#fb923c;"></span>Inferno</button>
+      <button class="color-swatch-btn" data-color="#34d399"><span class="swatch-dot" style="background:#34d399;"></span>Emerald</button>
+      <button class="color-swatch-btn" data-color="#fbbf24"><span class="swatch-dot" style="background:#fbbf24;"></span>Gold</button>
+      <button class="color-swatch-btn" data-color="#f472b6"><span class="swatch-dot" style="background:#f472b6;"></span>Sakura</button>
+      <button class="color-swatch-btn" data-color="#f87171"><span class="swatch-dot" style="background:#f87171;"></span>Crimson</button>
+      <button class="color-swatch-btn" data-color="#e2e8f0"><span class="swatch-dot" style="background:#e2e8f0;"></span>Frost</button>
+    </div>
+
+    <div class="custom-color-row">
+      <span>Custom Color</span>
+      <input type="color" id="customColorPicker" value="#38bdf8" />
     </div>
   </div>
-  <div class="solve-list" id="solveList"></div>
 </aside>
 
-<!-- Themes Modal -->
-<div class="modal-backdrop" id="themesModal">
-  <div class="modal" style="width:430px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-weight:600;font-size:0.95rem;">🎨 Themes</span>
-      <button class="pill-btn" id="closeThemesBtn" style="padding:4px 9px;">✕</button>
-    </div>
-
-    <div class="theme-section-label">Animated Scenic Environments</div>
-    <div class="theme-grid">
-      <button class="theme-card" data-theme="clouds"><span class="theme-icon">☁️</span>Sky Clouds</button>
-      <button class="theme-card" data-theme="forest"><span class="theme-icon">🌲</span>Mist Forest</button>
-      <button class="theme-card" data-theme="rain"><span class="theme-icon">🌧️</span>Rainstorm</button>
-      <button class="theme-card" data-theme="snow"><span class="theme-icon">❄️</span>Snowfall</button>
-    </div>
-
-    <div class="theme-section-label">Atmospheric Palettes</div>
-    <div class="theme-grid">
-      <button class="theme-card" data-theme="galaxy"><span class="theme-icon">🌌</span>Galaxy</button>
-      <button class="theme-card" data-theme="inferno"><span class="theme-icon">🔥</span>Inferno</button>
-      <button class="theme-card" data-theme="cyber"><span class="theme-icon">💠</span>Cyberpunk</button>
-      <button class="theme-card" data-theme="emerald"><span class="theme-icon">🟢</span>Emerald Matrix</button>
-      <button class="theme-card" data-theme="solar"><span class="theme-icon">☀️</span>Solar Gold</button>
-      <button class="theme-card" data-theme="sakura"><span class="theme-icon">🌸</span>Sakura</button>
-      <button class="theme-card" data-theme="obsidian"><span class="theme-icon">🌑</span>Obsidian</button>
-    </div>
+<!-- 2. Config Side Drawer -->
+<aside class="side-drawer" id="configDrawer">
+  <div class="drawer-head">
+    <span>⚙️ Config</span>
+    <button class="pill-btn close-drawer-btn" style="padding:3px 8px;">✕</button>
   </div>
-</div>
-
-<!-- Config Modal -->
-<div class="modal-backdrop" id="configModal">
-  <div class="modal" style="width:400px;">
-    <div style="font-weight:600;font-size:0.95rem;">⚙️ Config</div>
-    <div class="modal-row">
-      <span>Show Button Text Labels ("Themes", "Config", "History")</span>
+  <div class="drawer-body">
+    <div class="section-label">Interface</div>
+    <div class="config-card">
+      <span>Show Text Labels ("Themes", "Config", "History")</span>
       <label class="switch">
         <input type="checkbox" id="toggleLabelsChk">
         <span class="slider"></span>
       </label>
     </div>
-    <div class="modal-row">
+
+    <div class="section-label">Dual-Hand Trigger Keys</div>
+    <div class="config-card">
       <span>Left Key</span>
       <button class="pill-btn" id="bindLeftBtn">AltLeft</button>
     </div>
-    <div class="modal-row">
+    <div class="config-card">
       <span>Right Key</span>
       <button class="pill-btn" id="bindRightBtn">AltRight</button>
     </div>
-    <div class="modal-row">
+    <div class="config-card">
       <span>Hold Delay</span>
-      <div style="display:flex;gap:6px;">
+      <div style="display:flex;gap:5px;">
         <button class="pill-btn delay-btn" data-ms="300">0.30s</button>
         <button class="pill-btn delay-btn active" data-ms="450">0.45s</button>
         <button class="pill-btn delay-btn" data-ms="650">0.65s</button>
       </div>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:6px;">
-      <button class="pill-btn" id="resetKeysBtn">Reset Defaults</button>
-      <button class="pill-btn active" id="closeConfigBtn">Done</button>
+
+    <button class="pill-btn" id="resetKeysBtn" style="justify-content:center;margin-top:4px;">Reset All Defaults</button>
+  </div>
+</aside>
+
+<!-- 3. History Side Drawer -->
+<aside class="side-drawer" id="historyDrawer">
+  <div class="drawer-head">
+    <span>📜 History</span>
+    <div style="display:flex;gap:6px;">
+      <button class="pill-btn" id="filterStarBtn" style="padding:4px 8px;font-size:0.74rem;">★ Only</button>
+      <button class="pill-btn" id="clearAllBtn" style="padding:4px 8px;font-size:0.74rem;">Clear All</button>
+      <button class="pill-btn close-drawer-btn" style="padding:3px 8px;">✕</button>
     </div>
   </div>
-</div>
+  <div class="drawer-body">
+    <div class="solve-list" id="solveList"></div>
+  </div>
+</aside>
 
 <!-- 3D Scramble Visualizer Modal -->
 <div class="modal-backdrop" id="visModal">
-  <div class="modal" style="width:500px;">
+  <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <span style="font-weight:600;font-size:0.92rem;">3D Scramble Guide (White Top, Green Front)</span>
       <button class="pill-btn" id="closeVisBtn" style="padding:4px 9px;">✕</button>
@@ -927,14 +926,15 @@ HTML_APP = r"""<!DOCTYPE html>
 
 <script>
 (() => {
-  const STORAGE_SOLVES = "cc_v7_solves";
-  const STORAGE_CFG = "cc_v7_cfg";
+  const STORAGE_SOLVES = "cc_v8_solves";
+  const STORAGE_CFG = "cc_v8_cfg";
 
   let cfg = {
     leftKey: "AltLeft",
     rightKey: "AltRight",
     holdMs: 450,
-    theme: "clouds",
+    scene: "clouds",
+    accentColor: "#38bdf8",
     showLabels: false
   };
   try {
@@ -947,6 +947,18 @@ HTML_APP = r"""<!DOCTYPE html>
     const saved = JSON.parse(localStorage.getItem(STORAGE_SOLVES));
     if (Array.isArray(saved)) solves = saved;
   } catch (e) {}
+
+  function hexToRgb(hex) {
+    const clean = hex.replace("#", "");
+    const num = parseInt(clean.length === 3 ? clean.split("").map(c => c + c).join("") : clean, 16);
+    return {
+      r: (num >> 16) & 255,
+      g: (num >> 8) & 255,
+      b: num & 255
+    };
+  }
+
+  let accentRgb = hexToRgb(cfg.accentColor);
 
   // Procedural Scenic & Atmospheric Background Canvas
   const canvas = document.getElementById("bgCanvas");
@@ -964,7 +976,7 @@ HTML_APP = r"""<!DOCTYPE html>
     const w = canvas.width;
     const h = canvas.height;
 
-    particles = Array.from({ length: 55 }, () => ({
+    particles = Array.from({ length: 58 }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
       r: Math.random() * 2 + 0.7,
@@ -982,12 +994,12 @@ HTML_APP = r"""<!DOCTYPE html>
       alpha: 0.08 + Math.random() * 0.1
     }));
 
-    rainDrops = Array.from({ length: 130 }, () => ({
+    rainDrops = Array.from({ length: 135 }, () => ({
       x: Math.random() * (w + 200),
       y: Math.random() * h,
       len: 14 + Math.random() * 18,
       speed: 9 + Math.random() * 7,
-      alpha: 0.14 + Math.random() * 0.24
+      alpha: 0.15 + Math.random() * 0.25
     }));
 
     treesFar = [];
@@ -1018,10 +1030,11 @@ HTML_APP = r"""<!DOCTYPE html>
   resizeCanvas();
 
   function drawCloudShape(x, y, scale, alpha) {
+    const { r, g, b } = accentRgb;
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(scale, scale);
-    ctx.fillStyle = `rgba(224, 242, 254, ${alpha})`;
+    ctx.fillStyle = `rgba(${Math.round((r + 255) / 2)}, ${Math.round((g + 255) / 2)}, ${Math.round((b + 255) / 2)}, ${alpha})`;
     ctx.beginPath();
     ctx.arc(0, 0, 42, 0, Math.PI * 2);
     ctx.arc(38, -10, 50, 0, Math.PI * 2);
@@ -1052,12 +1065,12 @@ HTML_APP = r"""<!DOCTYPE html>
   function drawBackgroundScene(now) {
     const w = canvas.width;
     const h = canvas.height;
+    const { r, g, b } = accentRgb;
     ctx.clearRect(0, 0, w, h);
 
-    if (cfg.theme === "clouds") {
-      // Soft sky gradient + drifting multi-puff clouds
+    if (cfg.scene === "clouds") {
       const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, "rgba(14, 41, 74, 0.55)");
+      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.16)`);
       grad.addColorStop(1, "rgba(7, 17, 32, 0.2)");
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
@@ -1070,19 +1083,18 @@ HTML_APP = r"""<!DOCTYPE html>
       return;
     }
 
-    if (cfg.theme === "forest") {
-      // Layered pine forest silhouettes + drifting fireflies & ground mist
+    if (cfg.scene === "forest") {
       const mist = ctx.createLinearGradient(0, h - 220, 0, h);
-      mist.addColorStop(0, "rgba(16, 185, 129, 0)");
-      mist.addColorStop(1, "rgba(16, 185, 129, 0.14)");
+      mist.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0)`);
+      mist.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.16)`);
       ctx.fillStyle = mist;
       ctx.fillRect(0, h - 220, w, 220);
 
       for (const t of treesFar) {
-        drawPineTree(t.x, h, t.width, t.height, "rgba(6, 36, 24, 0.65)");
+        drawPineTree(t.x, h, t.width, t.height, `rgba(${Math.round(r * 0.14)}, ${Math.round(g * 0.22)}, ${Math.round(b * 0.18)}, 0.72)`);
       }
       for (const t of treesNear) {
-        drawPineTree(t.x, h, t.width, t.height, "rgba(3, 22, 14, 0.92)");
+        drawPineTree(t.x, h, t.width, t.height, `rgba(${Math.round(r * 0.08)}, ${Math.round(g * 0.14)}, ${Math.round(b * 0.11)}, 0.94)`);
       }
 
       for (const p of particles) {
@@ -1094,22 +1106,21 @@ HTML_APP = r"""<!DOCTYPE html>
         const glow = 0.25 + 0.45 * Math.abs(Math.sin(now * 0.002 + p.phase));
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r + 0.6, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(110, 231, 183, ${glow})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${glow})`;
         ctx.fill();
       }
       return;
     }
 
-    if (cfg.theme === "rain") {
-      // Diagonal rain streaks + ground splash ripples + subtle distant lightning
+    if (cfg.scene === "rain") {
       if (Math.random() < 0.0025) lightningAlpha = 0.14;
       if (lightningAlpha > 0.002) {
-        ctx.fillStyle = `rgba(186, 230, 253, ${lightningAlpha})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${lightningAlpha})`;
         ctx.fillRect(0, 0, w, h);
         lightningAlpha *= 0.88;
       }
 
-      ctx.lineWidth = 1.1;
+      ctx.lineWidth = 1.15;
       for (const d of rainDrops) {
         d.x -= d.speed * 0.24;
         d.y += d.speed;
@@ -1120,7 +1131,7 @@ HTML_APP = r"""<!DOCTYPE html>
           d.y = -20;
           d.x = Math.random() * (w + 200);
         }
-        ctx.strokeStyle = `rgba(147, 197, 253, ${d.alpha})`;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${d.alpha})`;
         ctx.beginPath();
         ctx.moveTo(d.x, d.y);
         ctx.lineTo(d.x + d.len * 0.24, d.y - d.len);
@@ -1131,7 +1142,7 @@ HTML_APP = r"""<!DOCTYPE html>
         const rp = ripples[i];
         rp.r += 0.65;
         rp.a *= 0.93;
-        ctx.strokeStyle = `rgba(186, 230, 253, ${rp.a})`;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${rp.a})`;
         ctx.beginPath();
         ctx.ellipse(rp.x, rp.y, rp.r * 2.2, rp.r * 0.55, 0, 0, Math.PI * 2);
         ctx.stroke();
@@ -1140,7 +1151,7 @@ HTML_APP = r"""<!DOCTYPE html>
       return;
     }
 
-    if (cfg.theme === "snow") {
+    if (cfg.scene === "snow") {
       for (const p of particles) {
         p.y += 0.65 + p.r * 0.35;
         p.x += Math.sin(now * 0.0012 + p.phase) * 0.45;
@@ -1150,34 +1161,26 @@ HTML_APP = r"""<!DOCTYPE html>
         }
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r + 0.8, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(240, 249, 255, ${p.a + 0.2})`;
+        ctx.fillStyle = `rgba(${Math.round((r + 255) / 2)}, ${Math.round((g + 255) / 2)}, ${Math.round((b + 255) / 2)}, ${p.a + 0.2})`;
         ctx.fill();
       }
       return;
     }
 
-    // Standard ambient particles for Galaxy, Inferno, Cyber, Emerald, Solar, Sakura, Obsidian
-    const colorMap = {
-      obsidian: "148, 163, 184",
-      galaxy: "192, 132, 252",
-      inferno: "251, 146, 60",
-      cyber: "244, 114, 182",
-      emerald: "52, 211, 153",
-      solar: "251, 191, 36",
-      sakura: "249, 168, 212"
-    };
-    const rgb = colorMap[cfg.theme] || colorMap.galaxy;
-    for (const p of particles) {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0) p.x = w;
-      if (p.x > w) p.x = 0;
-      if (p.y < 0) p.y = h;
-      if (p.y > h) p.y = 0;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${rgb}, ${p.a})`;
-      ctx.fill();
+    if (cfg.scene === "galaxy") {
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h;
+        if (p.y > h) p.y = 0;
+        const twinkle = p.a * (0.65 + 0.35 * Math.sin(now * 0.003 + p.phase));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${twinkle})`;
+        ctx.fill();
+      }
     }
   }
 
@@ -1246,13 +1249,27 @@ HTML_APP = r"""<!DOCTYPE html>
   }
 
   function syncLabels() {
-    document.body.dataset.theme = cfg.theme;
+    document.body.dataset.scene = cfg.scene;
     document.body.classList.toggle("show-nav-labels", Boolean(cfg.showLabels));
     document.getElementById("toggleLabelsChk").checked = Boolean(cfg.showLabels);
 
-    document.querySelectorAll(".theme-card").forEach(b => {
-      b.classList.toggle("active", b.dataset.theme === cfg.theme);
+    accentRgb = hexToRgb(cfg.accentColor);
+    const { r, g, b } = accentRgb;
+    const root = document.documentElement.style;
+    root.setProperty("--accent", cfg.accentColor);
+    root.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
+    root.setProperty("--accent-glow", `rgba(${r}, ${g}, ${b}, 0.38)`);
+    root.setProperty("--bg-glow-1", `rgba(${r}, ${g}, ${b}, 0.24)`);
+    root.setProperty("--bg-glow-2", `rgba(${r}, ${g}, ${b}, 0.14)`);
+    document.getElementById("customColorPicker").value = cfg.accentColor;
+
+    document.querySelectorAll(".scene-card").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.scene === cfg.scene);
     });
+    document.querySelectorAll(".color-swatch-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.color.toLowerCase() === cfg.accentColor.toLowerCase());
+    });
+
     document.getElementById("sensorLeftLabel").textContent = prettyKey(cfg.leftKey);
     document.getElementById("sensorRightLabel").textContent = prettyKey(cfg.rightKey);
     document.getElementById("bindLeftBtn").textContent = cfg.leftKey;
@@ -1291,6 +1308,7 @@ HTML_APP = r"""<!DOCTYPE html>
     phase = "RUNNING";
     runStart = performance.now();
     document.body.classList.add("running");
+    closeAllDrawers();
     postActionsEl.classList.remove("visible");
     fillEl.style.width = "0%";
     fillEl.classList.remove("armed");
@@ -1388,9 +1406,7 @@ HTML_APP = r"""<!DOCTYPE html>
 
     // Dual-hand stop: require BOTH keys down to end the run
     if (phase === "RUNNING") {
-      if (leftDown && rightDown) {
-        stopRun();
-      }
+      if (leftDown && rightDown) stopRun();
       return;
     }
 
@@ -1821,30 +1837,60 @@ HTML_APP = r"""<!DOCTYPE html>
     document.getElementById("visModal").classList.remove("open");
   });
 
+  // Right-Side Drawer Navigation (Themes, Config, History)
+  const drawers = document.querySelectorAll(".side-drawer");
+  const navBtns = document.querySelectorAll(".emoji-nav-btn");
+
+  function closeAllDrawers() {
+    bindingTarget = null;
+    drawers.forEach(d => d.classList.remove("open"));
+    navBtns.forEach(b => b.classList.remove("active"));
+    syncLabels();
+  }
+
+  navBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.dataset.drawer;
+      const targetDrawer = document.getElementById(targetId);
+      const wasOpen = targetDrawer.classList.contains("open");
+      closeAllDrawers();
+      if (!wasOpen) {
+        targetDrawer.classList.add("open");
+        btn.classList.add("active");
+      }
+    });
+  });
+
+  document.querySelectorAll(".close-drawer-btn").forEach(btn => {
+    btn.addEventListener("click", closeAllDrawers);
+  });
+
   // UI Wiring
   document.querySelectorAll("button").forEach(btn => btn.addEventListener("focus", () => btn.blur()));
   scrambleEl.addEventListener("click", openVisualizer);
   document.getElementById("newScrambleBtn").addEventListener("click", newScramble);
 
-  // Themes Modal
-  const themesModal = document.getElementById("themesModal");
-  document.getElementById("themesBtn").addEventListener("click", () => themesModal.classList.add("open"));
-  document.getElementById("closeThemesBtn").addEventListener("click", () => themesModal.classList.remove("open"));
-  themesModal.addEventListener("click", e => {
-    if (e.target === themesModal) themesModal.classList.remove("open");
-  });
-
-  document.querySelectorAll(".theme-card").forEach(btn => {
+  // Scene & Color Selection
+  document.querySelectorAll(".scene-card").forEach(btn => {
     btn.addEventListener("click", () => {
-      cfg.theme = btn.dataset.theme;
+      cfg.scene = btn.dataset.scene;
       saveCfg();
     });
   });
 
-  document.getElementById("drawerBtn").addEventListener("click", () => {
-    document.getElementById("drawer").classList.toggle("open");
+  document.querySelectorAll(".color-swatch-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      cfg.accentColor = btn.dataset.color;
+      saveCfg();
+    });
   });
 
+  document.getElementById("customColorPicker").addEventListener("input", e => {
+    cfg.accentColor = e.target.value;
+    saveCfg();
+  });
+
+  // History Controls
   document.getElementById("filterStarBtn").addEventListener("click", e => {
     starOnly = !starOnly;
     e.target.classList.toggle("active", starOnly);
@@ -1864,15 +1910,7 @@ HTML_APP = r"""<!DOCTYPE html>
   document.getElementById("btnStar").addEventListener("click", () => lastRunId && window._ccAct(lastRunId, "star"));
   document.getElementById("btnDeleteLast").addEventListener("click", () => lastRunId && window._ccAct(lastRunId, "del"));
 
-  // Config Modal & Label Toggle
-  const modal = document.getElementById("configModal");
-  document.getElementById("configBtn").addEventListener("click", () => modal.classList.add("open"));
-  document.getElementById("closeConfigBtn").addEventListener("click", () => {
-    bindingTarget = null;
-    modal.classList.remove("open");
-    syncLabels();
-  });
-
+  // Config Controls
   document.getElementById("toggleLabelsChk").addEventListener("change", e => {
     cfg.showLabels = e.target.checked;
     saveCfg();
@@ -1900,6 +1938,8 @@ HTML_APP = r"""<!DOCTYPE html>
     cfg.rightKey = "AltRight";
     cfg.holdMs = 450;
     cfg.showLabels = false;
+    cfg.scene = "clouds";
+    cfg.accentColor = "#38bdf8";
     bindingTarget = null;
     saveCfg();
   });
